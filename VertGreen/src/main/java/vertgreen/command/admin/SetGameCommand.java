@@ -31,6 +31,7 @@ public class SetGameCommand extends Command implements ICommandOwnerRestricted {
         JDA jda = guild.getJDA();
         Games = "with " + message.getRawContent().replace("<<setgame ", "");
         jda.getPresence().setGame(Game.of(Games));
+        channel.sendMessage("Set game to: `" + Games + "`").queue();
     }
 
     @Override
