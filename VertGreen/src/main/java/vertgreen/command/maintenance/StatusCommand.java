@@ -24,7 +24,12 @@ public class StatusCommand extends Command implements IMaintenanceCommand {
         eb = new EmbedBuilder();
         eb.setColor(BotConstants.VERTGREEN);
         status = "Status: " + jda.getStatus() + "\n"; 
-        ping = "Ping: " + jda.getPing() + "ms\n"; 
+        if (invoker.getId().equals("197063812027908097"){
+            ping = "Ping: " + jda.getPing() + "ms\n"; 
+            }
+        else {
+            ping = "Ping:  OWNER RESTRICTED\n";
+            }
         shard = "Shard: " + VertGreen.getInstance(guild.getJDA()).getShardInfo().getShardString() + "\n"; 
         guildn = "Guild: " + guild.getName() +"\n";
         eb.addField("<:online:313956277808005120> All systems green <:online:313956277808005120>" , status + ping + guildn + shard, true);
