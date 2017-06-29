@@ -24,7 +24,7 @@ public class StatusCommand extends Command implements IMaintenanceCommand {
         eb = new EmbedBuilder();
         eb.setColor(BotConstants.VERTGREEN);
         status = "Status: " + jda.getStatus() + "\n"; 
-        if (invoker.getUser().getId().equals("197063812027908097"){
+        if (invoker.getUser().getId().equals("320192251479195648")){
             ping = "Ping: " + jda.getPing() + "ms\n"; 
             }
         else {
