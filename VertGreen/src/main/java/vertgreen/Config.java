@@ -152,7 +152,7 @@ public class Config {
                 //it sometimes fails cause network isn'T set up yet. wait 10 sec and try one more time in that case
                 try {
                     //numShards = DiscordUtil.getRecommendedShardCount(getBotToken());
-                    numShards = shards;
+                    numShards = '5';//shards;
                 } catch (Exception e) {
                     try {
                         Thread.sleep(10000);
