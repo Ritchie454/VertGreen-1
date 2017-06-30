@@ -300,7 +300,7 @@ public abstract class VertGreen {
         }
 
         log.info("Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString());
-       // getTextChannelById("330067321148145675").sendMessage("[:rocket:]Received new ready event!").queue();
+        getTextChannelById("330067321148145675").sendMessage("[:rocket:]Received new ready event!").queue();
         int ready = numShardsReady.get();
         if (ready == Config.CONFIG.getNumShards()) {
             log.info("All " + ready + " shards are ready.");
