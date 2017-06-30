@@ -50,7 +50,7 @@ public class EventLogger extends ListenerAdapter {
         send(
                 "[:white_check_mark:] Joined guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`."
         );
-        getTextChannelById("330067321148145675").sendMessage("[:white_check_mark:] Joined guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
+        jda.getTextChannelById("330067321148145675").sendMessage("[:white_check_mark:] Joined guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
      
     }
 
@@ -59,17 +59,17 @@ public class EventLogger extends ListenerAdapter {
         send(
                 "[:x:] Left guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`."
         );
-        getTextChannelById("330067321148145675").sendMessage("[:x:] Left guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
+        jda.getTextChannelById("330067321148145675").sendMessage("[:x:] Left guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
     }
 
     private final Runnable ON_SHUTDOWN = () -> {
         Runtime rt = Runtime.getRuntime();
         if(VertGreen.shutdownCode != VertGreen.UNKNOWN_SHUTDOWN_CODE){
             send("[:door:] Exiting with code " + VertGreen.shutdownCode + ".");
-            getTextChannelById("330067321148145675").sendMessage("[:door:] Exiting with code " + VertGreen.shutdownCode + ".").queue();
+            jda.getTextChannelById("330067321148145675").sendMessage("[:door:] Exiting with code " + VertGreen.shutdownCode + ".").queue();
         } else {
             send("[:door:] Exiting with unknown code.");
-            getTextChannelById("330067321148145675").sendMessage("[:door:] Exiting with unknown code.").queue();
+            jda.getTextChannelById("330067321148145675").sendMessage("[:door:] Exiting with unknown code.").queue();
         }
     };
 
