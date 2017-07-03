@@ -17,7 +17,8 @@ public class MainCommandInitializer {
         CommandRegistry.registerAlias("help", "info");
 
         CommandRegistry.registerCommand("commands", new CommandsCommand());
-        CommandRegistry.registerAlias("commands", "comms", "cmds");
+        CommandRegistry.registerAlias("commands", "comms");
+        CommandRegistry.registerAlias("commands", "cmds");
         CommandRegistry.registerCommand("status", new StatusCommand());
         CommandRegistry.registerCommand("memory", new MemoryCommand());
         CommandRegistry.registerCommand("shards", new ShardsCommand());
