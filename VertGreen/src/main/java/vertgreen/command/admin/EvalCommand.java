@@ -17,6 +17,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.concurrent.*;
+import net.dv8tion.jda.core.OnlineStatus;
 
 public class EvalCommand extends Command implements ICommandOwnerRestricted {
     
@@ -42,7 +43,7 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         channel.sendTyping().queue();
         Runtime rt = Runtime.getRuntime();
         final String source = message.getRawContent().substring(args[0].length() + 1);
-        
+        jda.getPresence().setStatus(OnlineStatus.ONLINE);
         engine.put("jda", jda);
         engine.put("api", jda);
         engine.put("channel", channel);

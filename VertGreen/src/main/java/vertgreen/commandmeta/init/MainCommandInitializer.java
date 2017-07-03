@@ -17,7 +17,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerAlias("help", "info");
 
         CommandRegistry.registerCommand("commands", new CommandsCommand());
-        CommandRegistry.registerAlias("commands", "comms");
+        CommandRegistry.registerAlias("commands", "comms", "cmds");
         CommandRegistry.registerCommand("status", new StatusCommand());
         CommandRegistry.registerCommand("memory", new MemoryCommand());
         CommandRegistry.registerCommand("shards", new ShardsCommand());
@@ -46,7 +46,6 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("roles", new RolesCommand());
         CommandRegistry.registerCommand("kservers", new KnownServersCommand());
         CommandRegistry.registerCommand("eval", new EvalCommand());
-        CommandRegistry.registerCommand("mvntest", new MavenTestCommand());
         CommandRegistry.registerCommand("revive", new ReviveCommand());
         CommandRegistry.registerCommand("slist", new ShardListCommand());
         CommandRegistry.registerAlias("slist", "shardlist");
