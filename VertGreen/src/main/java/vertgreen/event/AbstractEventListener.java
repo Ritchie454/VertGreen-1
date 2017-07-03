@@ -13,7 +13,7 @@ public abstract class AbstractEventListener extends ListenerAdapter {
 
     static final Pattern COMMAND_NAME_PREFIX = Pattern.compile("(\\w+)");
     private final HashMap<String, UserListener> userListener = new HashMap<>();
-
+//
     AbstractEventListener() {
 
     }

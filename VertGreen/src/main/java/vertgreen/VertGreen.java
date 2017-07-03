@@ -18,6 +18,7 @@ import vertgreen.commandmeta.init.MusicCommandInitializer;
 import vertgreen.db.DatabaseManager;
 import vertgreen.event.EventListenerGreen;
 import vertgreen.event.EventListenerVert;
+import vertgreen.event.EventLogger;
 import vertgreen.event.ShardWatchdogListener;
 import vertgreen.feature.I18n;
 import vertgreen.util.DistributionEnum;
@@ -63,6 +64,7 @@ public abstract class VertGreen {
     public static int shutdownCode = UNKNOWN_SHUTDOWN_CODE;//Used when specifying the intended code for shutdown hooks
     static EventListenerGreen listenerBot;
     static EventListenerVert listenerSelf;
+    static EventLogger eventlogger;
     ShardWatchdogListener shardWatchdogListener = null;
     private static AtomicInteger numShardsReady = new AtomicInteger(0);
 
@@ -154,6 +156,7 @@ public abstract class VertGreen {
         //Initialise event listeners
         listenerBot = new EventListenerGreen();
         listenerSelf = new EventListenerVert();
+        eventlogger = new EventLogger("330067321148145675");
 
         //Commands
         if(Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT
@@ -300,7 +303,7 @@ public abstract class VertGreen {
         }
 
         log.info("Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString());
-        getTextChannelById("330067321148145675").sendMessage(":rocket: Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString()).queue();
+        //getTextChannelById("330067321148145675").sendMessage(":rocket: Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString()).queue();
         int ready = numShardsReady.get();
         if (ready == Config.CONFIG.getNumShards()) {
             log.info("All " + ready + " shards are ready.");

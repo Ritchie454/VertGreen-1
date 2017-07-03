@@ -258,10 +258,6 @@ public class Config {
         return numShards;
     }
 
-    public String getMashapeKey() {
-        return mashapeKey;
-    }
-
     public String getMalUser() {
         return malUser;
     }
