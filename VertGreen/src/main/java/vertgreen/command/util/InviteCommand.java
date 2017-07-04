@@ -11,14 +11,17 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.text.MessageFormat;
+import net.dv8tion.jda.core.EmbedBuilder;
 
 public class InviteCommand extends Command implements IUtilCommand {
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args)  {
+        EmbedBuilder eb = new EmbedBuilder();
         try {
-            String str = "https://kurozu.me/VertGreen.html";
-            String send = MessageFormat.format(I18n.get(guild).getString("invite"),DiscordUtil.getApplicationInfo(message.getJDA().getToken().substring(4)).getString("name"));
-            channel.sendMessage(send + "\n" + str).queue();
+            eb.setAuthor("Invite Link for " + DiscordUtil.getApplicationInfo(message.getJDA().getToken().substring(4)).getString("name"), "https://kurozu.me/VertGreen", message.getJDA().getSelfUser().getAvatarUrl());
+            eb.addField("Invite the bot", "https://kurozu.me/VertGreen", true);
+            eb.addField("Join the Support server", "https://kurozu.me/VertSupport", true);
+            channel.sendMessage(eb.build()).queue();
         } catch (UnirestException e) {
             throw new RuntimeException(e);
         }
