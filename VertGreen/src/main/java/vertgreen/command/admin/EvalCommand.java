@@ -43,7 +43,6 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         channel.sendTyping().queue();
         Runtime rt = Runtime.getRuntime();
         final String source = message.getRawContent().substring(args[0].length() + 1);
-        jda.getPresence().setStatus(OnlineStatus.ONLINE);
         engine.put("jda", jda);
         engine.put("api", jda);
         engine.put("channel", channel);
@@ -57,7 +56,6 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         engine.put("pm", AbstractPlayer.getPlayerManager());
         engine.put("eb", eb);
         engine.put("rt", rt);
-        
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         ScheduledFuture<?> future = service.schedule(() -> {
 
