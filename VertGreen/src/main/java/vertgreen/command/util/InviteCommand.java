@@ -16,7 +16,7 @@ public class InviteCommand extends Command implements IUtilCommand {
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args)  {
         try {
-            String str = "https://kuro.fred.moe/VertGreen.html";
+            String str = "https://kurozu.me/VertGreen.html";
             String send = MessageFormat.format(I18n.get(guild).getString("invite"),DiscordUtil.getApplicationInfo(message.getJDA().getToken().substring(4)).getString("name"));
             channel.sendMessage(send + "\n" + str).queue();
         } catch (UnirestException e) {
