@@ -20,6 +20,7 @@ public class InviteCommand extends Command implements IUtilCommand {
         try {
             eb.setAuthor("Invite Link for " + DiscordUtil.getApplicationInfo(message.getJDA().getToken().substring(4)).getString("name"), "https://kurozu.me/VertGreen", message.getJDA().getSelfUser().getAvatarUrl());
             eb.addField("Invite the bot", "https://kurozu.me/VertGreen", true);
+            eb.addBlankField(true);
             eb.addField("Join the Support server", "https://kurozu.me/VertSupport", true);
             channel.sendMessage(eb.build()).queue();
         } catch (UnirestException e) {
