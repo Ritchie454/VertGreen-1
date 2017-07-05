@@ -7,10 +7,7 @@ import vertgreen.commandmeta.CommandRegistry;
 import vertgreen.feature.I18n;
 import vertgreen.util.DiscordUtil;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 import vertgreen.util.BotConstants;
 import java.text.MessageFormat;
 import java.util.*;
@@ -29,10 +26,9 @@ public class CommandsCommand extends Command implements IUtilCommand {
     private void mainBotHelp(Guild guild, TextChannel channel, Member invoker) {
         Set<String> commandsAndAliases = CommandRegistry.getRegisteredCommandsAndAliases();
         Set<String> unsortedAliases = new HashSet<>(); //hash set = only unique commands
-        for (String commandOrAlias : commandsAndAliases) {
-            String mainAlias = CommandRegistry.getCommand(commandOrAlias).name;
+        commandsAndAliases.stream().map((commandOrAlias) -> CommandRegistry.getCommand(commandOrAlias).name).forEachOrdered((mainAlias) -> {
             unsortedAliases.add(mainAlias);
-        }
+        });
         //alphabetical order
         List<String> sortedAliases = new ArrayList<>(unsortedAliases);
         Collections.sort(sortedAliases);
@@ -42,8 +38,8 @@ public class CommandsCommand extends Command implements IUtilCommand {
         String mod = I18n.get(guild).getString("commandsModeration");
         String maint = I18n.get(guild).getString("commandsMaintenance");
         String owner = I18n.get(guild).getString("commandsBotOwner");
-        String user = "user";
-        String image = "image";
+        String user = "User";
+        String image = "Image";
 
         for (String alias : sortedAliases) {
             Command c = CommandRegistry.getCommand(alias).command;
@@ -79,8 +75,8 @@ public class CommandsCommand extends Command implements IUtilCommand {
         eb.setTitle("<:botTag:230105988211015680> Commands <:botTag:230105988211015680>");
         eb.addField("Fun", fun.replace("Fun", ""), true);
         eb.addField("Utility", util.replace("Utility", ""), true);
-        eb.addField("User", user.replace("user", ""), true);
-        eb.addField("Images", image.replace("image", ""), true);
+        eb.addField("User", user.replace("User", ""), true);
+        eb.addField("Images", image.replace("Image", ""), true);
         String mods = "";
         String owners = "";
         if (invoker.hasPermission(Permission.MESSAGE_MANAGE)) {
@@ -96,7 +92,7 @@ public class CommandsCommand extends Command implements IUtilCommand {
         eb.addField(MessageFormat.format(I18n.get(guild).getString("commandsMoreHelp"), "`" + Config.CONFIG.getPrefix() + "help <command>`"), "", true);
         channel.sendMessage(eb.build()).queue();
         try {
-        String comurl = TextUtils.postToHastebin("VERTBOT COMMANDS\n--------------------------------------------\n" + "-Fun----------------------------------------\n" + fun.replace("Fun", "") + "\n-Utility------------------------------------\n" + util.replace("Utility", "") + "-User---------------------------------------\n" + user.replace("user", "") + "\n-Images-------------------------------------\n" + image.replace("images", "") + mods + owners, true) + ".vertcmds";
+        String comurl = TextUtils.postToHastebin("VERTBOT COMMANDS\n--------------------------------------------\n" + "-Fun----------------------------------------\n" + fun.replace("Fun", "") + "\n-Utility------------------------------------\n" + util.replace("Utility", "") + "-User---------------------------------------\n" + user.replace("User", "") + "\n-Images-------------------------------------\n" + image.replace("images", "") + mods + owners, true) + ".vertcmds";
         channel.sendMessage("If you can't see embeds, you can use this handy link instead!\n" + comurl).queue();
         }
         catch (UnirestException ex) {

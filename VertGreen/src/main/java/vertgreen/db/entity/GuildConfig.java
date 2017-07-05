@@ -1,5 +1,6 @@
 package vertgreen.db.entity;
 
+import java.io.Serializable;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -11,7 +12,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "guild_config")
 @Cache(usage= CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region="guild_config")
-public class GuildConfig implements IEntity {
+public class GuildConfig implements IEntity, Serializable {
 
     @Id
     private String guildId;

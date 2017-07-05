@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 import java.util.Random;
 
 public class ServerInfoCommand extends Command implements IUtilCommand {
-    EmbedBuilder eb = new EmbedBuilder();
+    EmbedBuilder eb;
     Random rand = new Random();
     int n = rand.nextInt(13);
     int i = 0;
@@ -25,15 +25,14 @@ public class ServerInfoCommand extends Command implements IUtilCommand {
     
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
+        eb = new EmbedBuilder();
         ResourceBundle rb = I18n.get(guild);
         pickColor();
         eb.setTitle(MessageFormat.format(I18n.get(guild).getString("serverinfoTitle"),guild.getName()), null);
         eb.setThumbnail(guild.getIconUrl());
-        for (Member u : guild.getMembers()) {
-            if(u.getOnlineStatus() != OnlineStatus.OFFLINE) {
-                i++;
-            }
-        }
+        guild.getMembers().stream().filter((u) -> (u.getOnlineStatus() != OnlineStatus.OFFLINE)).forEachOrdered((_item) -> {
+            i++;
+        });
         eb.addField(rb.getString("serverinfoOnlineUsers"), String.valueOf(i),true);
         eb.addField(rb.getString("serverinfoTotalUsers"), String.valueOf(guild.getMembers().size()),true);
         eb.addField(rb.getString("serverinfoRoles"), String.valueOf(guild.getRoles().size()),true);
