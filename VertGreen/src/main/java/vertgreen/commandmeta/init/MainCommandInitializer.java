@@ -58,6 +58,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("botrestart", new FullRestartCommand());
         CommandRegistry.registerCommand("sysinfo", new SysInfoCommand());
         CommandRegistry.registerCommand("setgame", new SetGameCommand());
+        CommandRegistry.registerCommand("revive", new ReviveCommand());
     }
 
 }
