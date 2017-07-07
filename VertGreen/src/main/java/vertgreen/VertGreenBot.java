@@ -38,7 +38,7 @@ public class VertGreenBot extends VertGreen {
             boolean success = false;
             while (!success) {
                 JDABuilder builder = new JDABuilder(AccountType.BOT)
-                        .addEventListener(new EventLogger("318482059486167050"))
+                        .addEventListener(new EventLogger())
                         .addEventListener(shardWatchdogListener)
                         .setToken(Config.CONFIG.getBotToken())
                         .setBulkDeleteSplittingEnabled(true)

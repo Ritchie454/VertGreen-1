@@ -1,12 +1,16 @@
-## VertGreen
-VertGreen is a selfhosted and highly modified version of the discord bot FredBoat (A music bot), It is designed to be completely lag free however I cannot guarantee this since It is hosted on a 2.50 euro server :D, You can donate on Patron here! https://www.patreon.com/VertGreen
-## Discord Stuff
+## VertGreen  [![Dependency Status](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e/badge.svg)](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e)
 
-You can invite the bot to your server using this link:
-https://discordapp.com/oauth2/authorize?&client_id=320192251479195648&scope=bot
+VertGreen is a selfhosted and highly modified version of the discord bot FredBoat (A music bot), It is designed to be completely lag free too!
+You can donate on Patron below!
 
-You can join my server (The bot's main hub) using this link:
-http://discord.gg/dWVqUP5
+[![Donate](https://kurozu.me/DonateButton.png)](https://www.patreon.com/VertGreen)
+## Discord Stuff 
+
+You can Invite the bot or Join my server below!
+
+[![Invite Vert](https://kurozu.me/InviteButton.png)](https://kurozu.me/VertGreen)
+[![Join Uzume's Hideout](https://discordapp.com/api/guilds/285472208686546946/embed.png?style=banner2)](https://discord.gg/dWVqUP5)
+
 
 ## Copyright
    MIT License

@@ -33,6 +33,5 @@
 
     <modules>
         <module>VertGreen</module>
-        <module>VertGreen-Bootloader</module>
     </modules>
 </project>

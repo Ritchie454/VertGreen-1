@@ -156,7 +156,7 @@ public abstract class VertGreen {
         //Initialise event listeners
         listenerBot = new EventListenerGreen();
         listenerSelf = new EventListenerVert();
-        eventlogger = new EventLogger("330067321148145675");
+        eventlogger = new EventLogger();
 
         //Commands
         if(Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT

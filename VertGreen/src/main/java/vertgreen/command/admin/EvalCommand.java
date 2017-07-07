@@ -56,6 +56,7 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         engine.put("pm", AbstractPlayer.getPlayerManager());
         engine.put("eb", eb);
         engine.put("rt", rt);
+
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         ScheduledFuture<?> future = service.schedule(() -> {
 
@@ -70,7 +71,7 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
                 channel.sendMessage("`"+ex.getMessage()+"`").queue();
                 log.error("Error occurred in eval", ex);
                 return;
-            }
+        }
 
             String outputS;
             if (out == null) {
