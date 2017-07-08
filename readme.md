@@ -10,9 +10,8 @@ You can Invite the bot or Join my server below!
 
 [![Invite Vert](https://kurozu.me/InviteButton.png)](https://kurozu.me/VertGreen)
 [![Join Uzume's Hideout](https://discordapp.com/api/guilds/285472208686546946/embed.png?style=banner2)](https://discord.gg/dWVqUP5)
-
-
 # Copyright
+
    MIT License
     Copyright (c) 2017 Frederik Ar. Mikkelsen
   

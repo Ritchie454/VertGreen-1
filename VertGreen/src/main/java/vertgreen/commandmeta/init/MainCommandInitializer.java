@@ -32,7 +32,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("exit", new ExitCommand());
         CommandRegistry.registerCommand("avatar", new AvatarCommand());
         CommandRegistry.registerCommand("boast", new JokeCommand());
-        CommandRegistry.registerCommand("update", new UpdateCommand());
+        CommandRegistry.registerCommand("gitpull", new GitPullCommand());
         CommandRegistry.registerCommand("clear", new ClearCommand());
         CommandRegistry.registerCommand("talk", new TalkCommand());
         CommandRegistry.registerCommand("mal", new MALCommand());
@@ -55,10 +55,11 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("rb2", new RB2Command());
         CommandRegistry.registerCommand("rb3", new RB3Command());
         CommandRegistry.registerCommand("vii", new VIICommand());
-        CommandRegistry.registerCommand("botrestart", new FullRestartCommand());
+        CommandRegistry.registerCommand("botrestart", new BotRestartCommand());
         CommandRegistry.registerCommand("sysinfo", new SysInfoCommand());
         CommandRegistry.registerCommand("setgame", new SetGameCommand());
         CommandRegistry.registerCommand("revive", new ReviveCommand());
+        CommandRegistry.registerCommand("compile", new CompileCommand());
     }
 
 }

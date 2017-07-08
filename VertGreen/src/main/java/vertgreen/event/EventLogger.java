@@ -1,5 +1,6 @@
 package vertgreen.event;
 
+import net.dv8tion.jda.core.events.message.MessageDeleteEvent;
 import vertgreen.VertGreen;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
@@ -22,19 +23,22 @@ public class EventLogger extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
+        msg = "[:rocket:] Received ready event.";
         jda = event.getJDA();
-        jda.getTextChannelById(logChannelId).sendMessage("[:rocket:] Received ready event.").queue();
+        jda.getTextChannelById(logChannelId).sendMessage(msg).queue();
     }
 
     @Override
     public void onGuildJoin(GuildJoinEvent event) {
+        msg = "[<:White_check_mark:333308311443341313>] Joined guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.";
         jda = event.getJDA();
-        jda.getTextChannelById(logChannelId).sendMessage("[:white_check_mark:] Joined guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
+        jda.getTextChannelById(logChannelId).sendMessage(msg).queue();
     }
 
     @Override
     public void onGuildLeave(GuildLeaveEvent event) {
+        msg = "[<:White_cross_mark:333308311443341313>] Left guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.";
         jda = event.getJDA();
-        jda.getTextChannelById(logChannelId).sendMessage("[:x:] Left guild `" + event.getGuild() + "`. Users: `" + event.getGuild().getMembers().size() + "`.").queue();
+        jda.getTextChannelById(logChannelId).sendMessage(msg).queue();
     }
 }

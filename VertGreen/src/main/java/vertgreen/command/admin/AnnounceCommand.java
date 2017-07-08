@@ -1,60 +1,41 @@
 package vertgreen.command.admin;
 
-import vertgreen.audio.GuildPlayer;
-import vertgreen.audio.PlayerRegistry;
+import net.dv8tion.jda.core.entities.*;
+import vertgreen.VertGreen;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.commandmeta.abs.ICommandAdminRestricted;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.exceptions.PermissionException;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author frederik
- */
 public class AnnounceCommand extends Command implements ICommandAdminRestricted {
-
-    private static final String HEAD = "__**[BROADCASTED MESSAGE]**__\n";
 
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
-        List<GuildPlayer> players = PlayerRegistry.getPlayingPlayers();
+        List<User> owners = new ArrayList<>();
         String input = message.getRawContent().substring(args[0].length() + 1);
         String msg = input;
 
         Message status;
         try {
-            status = channel.sendMessage("[0/" + players.size() + "]").complete(true);
+            status = channel.sendMessage("Sending Messages...").complete(true);
         } catch (RateLimitedException e) {
             throw new RuntimeException(e);
         }
 
         new Thread(() -> {
-            int skipped = 0;
-            int sent = 0;
-            int i = 0;
-
-            for (GuildPlayer player : players) {
-                try {
-                    player.getActiveTextChannel().sendMessage(msg).complete(true);
-                    sent++;
-                } catch (PermissionException | RateLimitedException e) {
-                    skipped++;
+            try {
+                for (Guild g : VertGreen.getAllGuilds()) {
+                    owners.add(g.getOwner().getUser());
                 }
-
-                if (i % 20 == 0) {
-                    status.editMessage("[" + sent + "/" + (players.size() - skipped) + "]").queue();
+                for (User o : owners) {
+                    o.openPrivateChannel().complete(true);
+                    o.getPrivateChannel().sendMessage(msg).queue();
                 }
-
-                i++;
+            } catch (Exception e) {
             }
-
-            status.editMessage("[" + sent + "/" + (players.size() - skipped) + "]").queue();
+            status.editMessage("Messages Sent!\nAll known server owners have been notified~").queue();
         }).start();
     }
 
