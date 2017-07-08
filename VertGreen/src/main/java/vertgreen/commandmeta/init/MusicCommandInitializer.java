@@ -61,8 +61,8 @@ public class MusicCommandInitializer {
         CommandRegistry.registerCommand("shuffle", new ShuffleCommand());
         CommandRegistry.registerCommand("reshuffle", new ReshuffleCommand());
         CommandRegistry.registerCommand("repeat", new RepeatCommand());
-        CommandRegistry.registerCommand("volume", new VolumeCommand());
-        CommandRegistry.registerAlias("volume", "vol");
+        //CommandRegistry.registerCommand("volume", new VolumeCommand());
+        //CommandRegistry.registerAlias("volume", "vol");
         CommandRegistry.registerCommand("restart", new RestartCommand());
         CommandRegistry.registerCommand("export", new ExportCommand());
         CommandRegistry.registerCommand("playerdebug", new PlayerDebugCommand());
