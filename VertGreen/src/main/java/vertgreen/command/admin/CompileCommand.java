@@ -27,7 +27,7 @@ public class CompileCommand extends Command implements ICommandOwnerRestricted {
             EmbedBuilder eb2 = new EmbedBuilder();
             Runtime rt = Runtime.getRuntime();
             Message msg;
-            msg = channel.sendMessage("Downloading Update...").complete(true);
+            msg = channel.sendMessage("Compiling Update...").complete(true);
             eb.setTitle("<:stafftools:314348604095594498>Running `mvn package shade:shade`... ");
             channel.sendMessage(eb.build()).queue();
             File updateDir = new File("update/VertGreen");
