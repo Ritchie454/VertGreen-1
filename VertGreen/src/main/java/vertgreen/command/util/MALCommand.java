@@ -1,13 +1,40 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.command.util;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import net.dv8tion.jda.core.EmbedBuilder;
 import vertgreen.Config;
 import vertgreen.VertGreen;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.commandmeta.abs.IUtilCommand;
 import vertgreen.feature.I18n;
+import vertgreen.util.constant.BotConstants;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -18,8 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.slf4j.LoggerFactory;
-import net.dv8tion.jda.core.EmbedBuilder;
-import vertgreen.util.BotConstants;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -120,7 +145,7 @@ public class MALCommand extends Command implements IUtilCommand {
             return false;
         }
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(BotConstants.VERTGREEN);
+        eb.setColor(BotConstants.VERTGREEN_COLOR);
         eb.setThumbnail("https://myanimelist.cdn-dena.com/img/sp/icon/apple-touch-icon-256.png");
         if (data.has("title")){//MessageFormat.format(I18n.get(channel.getGuild()).getString("malTitle"), msg, data.get("title")) : msg;
             eb.addField("Title", "" + data.get("title"), true);
@@ -129,33 +154,33 @@ public class MALCommand extends Command implements IUtilCommand {
             eb.addField("English", "" + data.get("english"), true);
         }
         if (data.has("synonyms")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malSynonyms"), msg, data.get("synonyms")) : msg;
-        eb.addField("Synonyms", ""+data.get("synonyms"), true);
+            eb.addField("Synonyms", ""+data.get("synonyms"), true);
         }
         if (data.has("episodes")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malEpisodes"), msg, data.get("episodes")) : msg;
-        eb.addField("Episodes", ""+data.get("episodes"), true);
+            eb.addField("Episodes", ""+data.get("episodes"), true);
         }
         if (data.has("score")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malScore"), msg, data.get("score")) : msg;
-        eb.addField("Score", ""+data.get("score"), true);
+            eb.addField("Score", ""+data.get("score"), true);
         }
         if (data.has("type")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malType"), msg, data.get("type")) : msg;
-        eb.addField("Type", ""+data.get("type"), true);
+            eb.addField("Type", ""+data.get("type"), true);
         }
         if (data.has("status")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malStatus"), msg, data.get("status")) : msg;
-        eb.addField("Status", ""+data.get("status"), true);
+            eb.addField("Status", ""+data.get("status"), true);
         }
         if (data.has("end_date")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malEndDate"), msg, data.get("end_date")) + "\n" : msg;
-        eb.addField("End date", ""+data.get("end_date"), true);
+            eb.addField("End date", ""+data.get("end_date"), true);
         }
         if (data.has("synopsis")) {
             Matcher m = Pattern.compile("^[^\\n\\r<]+").matcher(StringEscapeUtils.unescapeHtml4(data.getString("synopsis")));
             m.find();
             if(data.has("synopsis")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malSynopsis"), msg, m.group(0)) : msg;
-            eb.addField("Synopsis", "" + m.group(0), true);
+                eb.addField("Synopsis", "" + m.group(0), true);
             }
         }
 
         if (data.has("id")) {// ? msg + "http://myanimelist.net/anime/" + data.get("id") + "/" : msg;
-        eb.addField("http://myanimelist.net/anime/" + data.get("id") + "/", "", true);
+            eb.addField("http://myanimelist.net/anime/" + data.get("id") + "/", "", true);
         }
         channel.sendMessage(eb.build()).queue();
         return true;
@@ -174,14 +199,14 @@ public class MALCommand extends Command implements IUtilCommand {
 
         JSONObject data = items.getJSONObject(0);
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(BotConstants.VERTGREEN);
+        eb.setColor(BotConstants.VERTGREEN_COLOR);
         if (data.has("name")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malUserName"), msg, data.get("name")) : msg;
             eb.setTitle(data.get("name").toString());
         }
         if (data.has("url")){// ? MessageFormat.format(I18n.get(channel.getGuild()).getString("malUrl"), msg, data.get("url")) : msg;
             eb.addField("Url", data.get("url").toString(), true);
         }
-        if (data.has("image_url")){// ? msg + data.get("image_url") : msg;   
+        if (data.has("image_url")){// ? msg + data.get("image_url") : msg;
             eb.setImage(data.get("image_url").toString());
         }
         //log.debug(msg);

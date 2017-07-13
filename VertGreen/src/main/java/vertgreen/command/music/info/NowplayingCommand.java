@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.command.music.info;
 
 import com.mashape.unirest.http.Unirest;
@@ -16,10 +41,10 @@ import vertgreen.commandmeta.MessagingException;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.commandmeta.abs.IMusicCommand;
 import vertgreen.feature.I18n;
-import vertgreen.util.BotConstants;
+import vertgreen.util.constant.BotConstants;
 import vertgreen.util.TextUtils;
-import vertgreen.util.YoutubeAPI;
-import vertgreen.util.YoutubeVideo;
+import vertgreen.util.rest.YoutubeAPI;
+import vertgreen.util.rest.YoutubeVideo;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
@@ -219,7 +244,7 @@ public class NowplayingCommand extends Command implements IMusicCommand {
                 .setAuthor(at.getInfo().author, null, null)
                 .setTitle(atc.getEffectiveTitle(), at.getIdentifier())
                 .setDescription(MessageFormat.format(I18n.get(channel.getGuild()).getString("npLoadedFromHTTP"), desc, at.getIdentifier())) //TODO: Probe data
-                .setColor(BotConstants.VERTGREEN)
+                .setColor(BotConstants.VERTGREEN_COLOR)
                 .setFooter(channel.getJDA().getSelfUser().getName(), channel.getJDA().getSelfUser().getAvatarUrl())
                 .build();
 
@@ -239,7 +264,7 @@ public class NowplayingCommand extends Command implements IMusicCommand {
                 .setAuthor(at.getInfo().author, null, null)
                 .setTitle(atc.getEffectiveTitle(), null)
                 .setDescription(MessageFormat.format(I18n.get(channel.getGuild()).getString("npLoadedDefault"), desc, at.getSourceManager().getSourceName()))
-                .setColor(BotConstants.VERTGREEN)
+                .setColor(BotConstants.VERTGREEN_COLOR)
                 .setFooter(channel.getJDA().getSelfUser().getName(), channel.getJDA().getSelfUser().getAvatarUrl())
                 .build();
 

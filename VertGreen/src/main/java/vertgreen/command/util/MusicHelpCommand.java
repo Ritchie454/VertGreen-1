@@ -1,20 +1,35 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.command.util;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
-import vertgreen.command.music.control.SkipCommand;
-import vertgreen.command.music.control.PlayCommand;
-import vertgreen.command.music.control.PauseCommand;
-import vertgreen.command.music.control.StopCommand;
-import vertgreen.command.music.control.PlaySplitCommand;
-import vertgreen.command.music.control.JoinCommand;
-import vertgreen.command.music.control.ReshuffleCommand;
-import vertgreen.command.music.control.LeaveCommand;
-import vertgreen.command.music.control.VolumeCommand;
-import vertgreen.command.music.control.UnpauseCommand;
-import vertgreen.command.music.control.SelectCommand;
-import vertgreen.command.music.control.RepeatCommand;
-import vertgreen.command.music.control.ShuffleCommand;
+import net.dv8tion.jda.core.EmbedBuilder;
+import vertgreen.command.music.control.*;
 import vertgreen.command.music.info.ExportCommand;
+import vertgreen.command.music.info.GensokyoRadioCommand;
 import vertgreen.command.music.info.ListCommand;
 import vertgreen.command.music.info.NowplayingCommand;
 import vertgreen.command.music.seeking.ForwardCommand;
@@ -22,20 +37,19 @@ import vertgreen.command.music.seeking.RestartCommand;
 import vertgreen.command.music.seeking.RewindCommand;
 import vertgreen.command.music.seeking.SeekCommand;
 import vertgreen.commandmeta.CommandRegistry;
+import vertgreen.commandmeta.MessagingException;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.commandmeta.abs.IMusicCommand;
 import vertgreen.commandmeta.abs.IUtilCommand;
 import vertgreen.feature.I18n;
+import vertgreen.util.TextUtils;
+import vertgreen.util.constant.BotConstants;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.EmbedBuilder;
-import vertgreen.util.BotConstants;
 
 import java.util.*;
-import vertgreen.commandmeta.MessagingException;
-import vertgreen.util.TextUtils;
 
 public class MusicHelpCommand extends Command implements IUtilCommand {
 
@@ -64,8 +78,8 @@ public class MusicHelpCommand extends Command implements IUtilCommand {
         Collections.sort(sortedComms, new MusicCommandsComparator());
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("🎵 Vert's Music Commands 🎵");
-        eb.setColor(BotConstants.VERTGREEN);
-        
+        eb.setColor(BotConstants.VERTGREEN_COLOR);
+
         //create help strings for each music command and its main alias
         List<String> musicComms = new ArrayList<>();
         for (Command command : sortedComms) {
@@ -76,7 +90,7 @@ public class MusicHelpCommand extends Command implements IUtilCommand {
             eb.addField(mainAlias, formattedHelp, true);
             Help = Help + mainAlias + "\n" + formattedHelp + "\n-----------------------\n";
         }
-        
+
         //output the resulting help, splitting it in several messages if necessary
         String out = "🎵 Vert's Music Commands 🎵\n";
         for (String s : musicComms) {
@@ -85,7 +99,7 @@ public class MusicHelpCommand extends Command implements IUtilCommand {
             }
             out += s + "\n";
         }
-        
+
         channel.sendMessage(eb.build()).queue();
         try {
             String comurl = TextUtils.postToHastebin(Help, true) + ".vertmusiccmds";
@@ -158,6 +172,8 @@ public class MusicHelpCommand extends Command implements IUtilCommand {
                 result = 10850;
             } else if (c instanceof SelectCommand) {
                 result = 10900;
+            } else if (c instanceof GensokyoRadioCommand) {
+                result = 10950;
             } else if (c instanceof VolumeCommand) {
                 result = 10970;
             } else {

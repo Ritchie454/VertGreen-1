@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.api;
 
 import vertgreen.Config;
@@ -46,22 +71,22 @@ public class API {
 
             //make a copy to avoid concurrent modification errors
             List<VertGreen> shards = new ArrayList<>(VertGreen.getShards());
-            for (VertGreen vg : shards) {
-                JSONObject vgStats = new JSONObject();
-                vgStats.put("id", vg.getShardInfo().getShardId())
-                        .put("guilds", vg.getJda().getGuilds().size())
-                        .put("users", vg.getJda().getUsers().size())
-                        .put("status", vg.getJda().getStatus());
+            for (VertGreen fb : shards) {
+                JSONObject fbStats = new JSONObject();
+                fbStats.put("id", fb.getShardInfo().getShardId())
+                        .put("guilds", fb.getJda().getGuilds().size())
+                        .put("users", fb.getJda().getUsers().size())
+                        .put("status", fb.getJda().getStatus());
 
-                a.put(vgStats);
+                a.put(fbStats);
             }
 
             JSONObject g = new JSONObject();
             g.put("playingPlayers", PlayerRegistry.getPlayingPlayers().size())
                     .put("totalPlayers", PlayerRegistry.getRegistry().size())
                     .put("distribution", Config.CONFIG.getDistribution())
-                    .put("guilds", VertGreen.getAllGuilds().size())
-                    .put("users", VertGreen.getAllUsersAsMap().size());
+                    .put("guilds", VertGreen.countAllGuilds())
+                    .put("users", VertGreen.countAllUniqueUsers());
 
             root.put("shards", a);
             root.put("global", g);

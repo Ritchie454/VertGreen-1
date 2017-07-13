@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.command.music.control;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -7,9 +32,11 @@ import vertgreen.audio.GuildPlayer;
 import vertgreen.audio.PlayerRegistry;
 import vertgreen.audio.VideoSelection;
 import vertgreen.commandmeta.abs.Command;
+import vertgreen.commandmeta.abs.ICommandRestricted;
 import vertgreen.commandmeta.abs.IMusicCommand;
 import vertgreen.feature.I18n;
-import vertgreen.util.SearchUtil;
+import vertgreen.perms.PermissionLevel;
+import vertgreen.util.rest.SearchUtil;
 import vertgreen.util.TextUtils;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -27,7 +54,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PlayCommand extends Command implements IMusicCommand {
+public class PlayCommand extends Command implements IMusicCommand, ICommandRestricted {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(PlayCommand.class);
     private final SearchUtil.SearchProvider searchProvider;
@@ -120,58 +147,64 @@ public class PlayCommand extends Command implements IMusicCommand {
         //Now remove all punctuation
         query = query.replaceAll("[.,/#!$%\\^&*;:{}=\\-_`~()]", "");
 
-        Message outMsg = channel.sendMessage(I18n.get(guild).getString("playSearching").replace("{q}", query)).complete(true);
-
-        AudioPlaylist list;
-        try {
-            list = SearchUtil.searchForTracks(searchProvider, query);
-        } catch (JSONException e) {
-            channel.sendMessage(I18n.get(guild).getString("playYoutubeSearchError")).queue();
-            log.debug("YouTube search exception", e);
-            return;
-        }
-
-        if (list == null || list.getTracks().size() == 0) {
-            outMsg.editMessage(I18n.get(guild).getString("playSearchNoResults").replace("{q}", query)).queue();
-        } else {
-            //Clean up any last search by this user
-            GuildPlayer player = PlayerRegistry.get(guild);
-
-            //Get at most 5 tracks
-            List<AudioTrack> selectable = list.getTracks().subList(0, Math.min(5, list.getTracks().size()));
-
-            VideoSelection oldSelection = player.selections.get(invoker.getUser().getId());
-            if(oldSelection != null) {
-                channel.deleteMessageById(oldSelection.getOutMsgId()).queue();
+        String finalQuery = query;
+        channel.sendMessage(I18n.get(guild).getString("playSearching").replace("{q}", query)).queue(outMsg -> {
+            AudioPlaylist list;
+            try {
+                list = SearchUtil.searchForTracks(searchProvider, finalQuery);
+            } catch (JSONException e) {
+                channel.sendMessage(I18n.get(guild).getString("playYoutubeSearchError")).queue();
+                log.debug("YouTube search exception", e);
+                return;
             }
 
-            MessageBuilder builder = new MessageBuilder();
-            builder.append(MessageFormat.format(I18n.get(guild).getString("playSelectVideo"), Config.CONFIG.getPrefix()));
+            if (list == null || list.getTracks().size() == 0) {
+                outMsg.editMessage(I18n.get(guild).getString("playSearchNoResults").replace("{q}", finalQuery)).queue();
+            } else {
+                //Clean up any last search by this user
+                GuildPlayer player = PlayerRegistry.get(guild);
 
-            int i = 1;
-            for (AudioTrack track : selectable) {
-                builder.append("\n**")
-                        .append(String.valueOf(i))
-                        .append(":** ")
-                        .append(track.getInfo().title)
-                        .append(" (")
-                        .append(TextUtils.formatTime(track.getInfo().length))
-                        .append(")");
+                //Get at most 5 tracks
+                List<AudioTrack> selectable = list.getTracks().subList(0, Math.min(5, list.getTracks().size()));
 
-                i++;
+                VideoSelection oldSelection = player.selections.get(invoker.getUser().getId());
+                if(oldSelection != null) {
+                    channel.deleteMessageById(oldSelection.getOutMsgId()).queue();
+                }
+
+                MessageBuilder builder = new MessageBuilder();
+                builder.append(MessageFormat.format(I18n.get(guild).getString("playSelectVideo"), Config.CONFIG.getPrefix()));
+
+                int i = 1;
+                for (AudioTrack track : selectable) {
+                    builder.append("\n**")
+                            .append(String.valueOf(i))
+                            .append(":** ")
+                            .append(track.getInfo().title)
+                            .append(" (")
+                            .append(TextUtils.formatTime(track.getInfo().length))
+                            .append(")");
+
+                    i++;
+                }
+
+                outMsg.editMessage(builder.build().getRawContent()).queue();
+
+                player.setCurrentTC(channel);
+
+                player.selections.put(invoker.getUser().getId(), new VideoSelection(selectable, outMsg));
             }
-
-            outMsg.editMessage(builder.build().getRawContent()).queue();
-
-            player.setCurrentTC(channel);
-
-            player.selections.put(invoker.getUser().getId(), new VideoSelection(selectable, outMsg));
-        }
+        });
     }
 
     @Override
     public String help(Guild guild) {
         String usage = "{0}{1} <url> OR {0}{1} <search-term>\n#";
         return usage + I18n.get(guild).getString("helpPlayCommand");
+    }
+
+    @Override
+    public PermissionLevel getMinimumPerms() {
+        return PermissionLevel.USER;
     }
 }

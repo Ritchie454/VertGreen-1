@@ -1,8 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import vertgreen.util.DiscordUtil;
-import vertgreen.util.DistributionEnum;
+import vertgreen.util.constant.DistributionEnum;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +78,7 @@ public class Config {
     private boolean restServerEnabled = true;
     private List<String> adminIds = new ArrayList<>();
     private boolean useAutoBlacklist = false;
-    private Integer shards;
-    
+
     //testing related stuff
     private String testBotToken;
     private String testChannelId;
@@ -62,7 +86,7 @@ public class Config {
     // SSH tunnel stuff
     private final boolean useSshTunnel;
     private final String sshHost; //Eg localhost:22
-    private final String sshUser; //Eg fredboat
+    private final String sshUser; //Eg vertgreen
     private final String sshPrivateKeyFile;
     private final int forwardToPort; //port where the remote database is listening, postgres default: 5432
 
@@ -107,7 +131,6 @@ public class Config {
 
             log.info("Using prefix: " + prefix);
 
-            shards = (Integer) config.getOrDefault("shards", shards);
             mashapeKey = (String) creds.getOrDefault("mashapeKey", "");
             malUser = (String) creds.getOrDefault("malUser", "");
             malPassword = (String) creds.getOrDefault("malPassword", "");
@@ -147,12 +170,14 @@ public class Config {
                 log.info("Not using lavaplayer nodes. Audio playback will be processed locally.");
             }
 
-           
+            if(getDistribution() == DistributionEnum.DEVELOPMENT) {
+                log.info("Development distribution; forcing 2 shards");
+                numShards = 2;
+            } else {
                 //this is the first request on start
                 //it sometimes fails cause network isn'T set up yet. wait 10 sec and try one more time in that case
                 try {
-                    //numShards = DiscordUtil.getRecommendedShardCount(getBotToken());
-                    numShards = shards;
+                    numShards = DiscordUtil.getRecommendedShardCount(getBotToken());
                 } catch (Exception e) {
                     try {
                         Thread.sleep(10000);
@@ -161,11 +186,12 @@ public class Config {
                     }
                     numShards = DiscordUtil.getRecommendedShardCount(getBotToken());
                 }
-                log.info("Using " + numShards + " shard(s)");
+                log.info("Discord recommends " + numShards + " shard(s)");
+            }
 
             //more database connections don't help with performance, so use a value based on available cores
             //http://www.dailymotion.com/video/x2s8uec_oltp-performance-concurrent-mid-tier-connections_tech
-            if (jdbcUrl == null || "".equals(jdbcUrl))
+            if (jdbcUrl == null || "".equals(jdbcUrl) || distribution == DistributionEnum.DEVELOPMENT)
                 //more than one connection for the fallback sqlite db is problematic as there is currently (2017-04-16)
                 // no supported way in the custom driver and/or dialect to set lock timeouts
                 hikariPoolSize = 1;
@@ -256,6 +282,10 @@ public class Config {
 
     public int getNumShards() {
         return numShards;
+    }
+
+    public String getMashapeKey() {
+        return mashapeKey;
     }
 
     public String getMalUser() {

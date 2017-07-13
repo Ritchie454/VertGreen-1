@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
@@ -7,6 +32,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
@@ -23,7 +49,7 @@ import vertgreen.audio.queue.SplitAudioTrackContext;
 import vertgreen.audio.queue.TrackEndMarkerHandler;
 import vertgreen.audio.source.PlaylistImportSourceManager;
 import vertgreen.audio.source.SpotifyPlaylistSourceManager;
-import vertgreen.util.DistributionEnum;
+import vertgreen.util.constant.DistributionEnum;
 import net.dv8tion.jda.core.audio.AudioSendHandler;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +111,7 @@ public abstract class AbstractPlayer extends AudioEventAdapter implements AudioS
         }
         //add new source managers above the HttpAudio one, because it will either eat your request or throw an exception
         //so you will never reach a source manager below it
-        //mng.registerSourceManager(new HttpAudioSourceManager());
+        mng.registerSourceManager(new HttpAudioSourceManager());
         
         return mng;
     }

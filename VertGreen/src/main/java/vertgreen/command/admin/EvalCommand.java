@@ -1,9 +1,37 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.command.admin;
 
+import net.dv8tion.jda.core.EmbedBuilder;
 import vertgreen.audio.AbstractPlayer;
 import vertgreen.audio.PlayerRegistry;
 import vertgreen.commandmeta.abs.Command;
-import vertgreen.commandmeta.abs.ICommandOwnerRestricted;
+import vertgreen.commandmeta.abs.ICommand;
+import vertgreen.commandmeta.abs.ICommandRestricted;
+import vertgreen.perms.PermissionLevel;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -11,16 +39,17 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import net.dv8tion.jda.core.EmbedBuilder;
-
+import java.text.MessageFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ArrayList;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.concurrent.*;
-import net.dv8tion.jda.core.OnlineStatus;
 
-public class EvalCommand extends Command implements ICommandOwnerRestricted {
-    
+public class EvalCommand extends Command implements ICommand, ICommandRestricted {
+
     private static final Logger log = LoggerFactory.getLogger(EvalCommand.class);
 
     //Thanks Dinos!
@@ -42,7 +71,9 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         EmbedBuilder eb = new EmbedBuilder();
         channel.sendTyping().queue();
         Runtime rt = Runtime.getRuntime();
+
         final String source = message.getRawContent().substring(args[0].length() + 1);
+
         engine.put("jda", jda);
         engine.put("api", jda);
         engine.put("channel", channel);
@@ -56,7 +87,6 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
         engine.put("pm", AbstractPlayer.getPlayerManager());
         engine.put("eb", eb);
         engine.put("rt", rt);
-
         ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
         ScheduledFuture<?> future = service.schedule(() -> {
 
@@ -71,11 +101,11 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
                 channel.sendMessage("`"+ex.getMessage()+"`").queue();
                 log.error("Error occurred in eval", ex);
                 return;
-        }
+            }
 
             String outputS;
             if (out == null) {
-                outputS = ":ok_hand:";
+                outputS = ":ok_hand::skin-tone-3:";
             } else if (out.toString().contains("\n")) {
                 outputS = "\nEval: ```\n" + out.toString() + "```";
             } else {
@@ -106,5 +136,10 @@ public class EvalCommand extends Command implements ICommandOwnerRestricted {
     @Override
     public String help(Guild guild) {
         return "{0}{1} <Java-code>\\n#Run the provided Java code.";
+    }
+
+    @Override
+    public PermissionLevel getMinimumPerms() {
+        return PermissionLevel.BOT_OWNER;
     }
 }

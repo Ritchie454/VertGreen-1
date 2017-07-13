@@ -1,12 +1,39 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.agent;
 
 import vertgreen.Config;
 import vertgreen.VertGreen;
 import vertgreen.event.ShardWatchdogListener;
-import vertgreen.util.DistributionEnum;
+import vertgreen.util.constant.DistributionEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
 import java.util.List;
 
 public class ShardWatchdogAgent extends Thread {
@@ -44,18 +71,25 @@ public class ShardWatchdogAgent extends Thread {
     private void inspect() throws InterruptedException {
         List<VertGreen> shards = VertGreen.getShards();
 
-        for(VertGreen shard : shards) {
+        for (VertGreen shard : shards) {
             if (shutdown) break;
             ShardWatchdogListener listener = shard.getShardWatchdogListener();
 
             long diff = System.currentTimeMillis() - listener.getLastEventTime();
 
-            if(diff > ACCEPTABLE_SILENCE) {
+            if (diff > ACCEPTABLE_SILENCE) {
                 if (listener.getEventCount() < 100) {
                     log.warn("Did not revive shard " + shard.getShardInfo() + " because it did not receive enough events since construction!");
                 } else {
                     log.warn("Reviving shard " + shard.getShardInfo() + " after " + (diff / 1000) +
                             " seconds of no events. Last event received was " + listener.getLastEvent());
+
+                    /*try {
+                        log.info("Thread dump for shard's JDA threads at time of death: " + getShardThreadDump(shard.getShardInfo().getShardId()));
+                    } catch (Exception e) {
+                        log.error("Got exception while printing thread dump after shard death was detected");
+                    }*/
+
                     shard.revive();
                     sleep(5000);
                 }
@@ -68,10 +102,23 @@ public class ShardWatchdogAgent extends Thread {
     }
 
     private static int getAcceptableSilenceThreshold() {
-        if(Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT) {
+        if (Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT) {
             return Integer.MAX_VALUE;
         }
 
         return Config.CONFIG.getNumShards() != 1 ? 30 * 1000 : 600 * 1000; //30 seconds or 10 minutes depending on shard count
+    }
+
+    private static String getShardThreadDump(int shardId) {
+        ThreadInfo[] threadInfos = ManagementFactory.getThreadMXBean()
+                .dumpAllThreads(true,
+                        true);
+        StringBuilder dump = new StringBuilder();
+        dump.append(String.format("%n"));
+        for (ThreadInfo threadInfo : threadInfos) {
+            if (threadInfo.getThreadName().contains("[" + shardId + " / "))
+                dump.append(threadInfo);
+        }
+        return dump.toString();
     }
 }

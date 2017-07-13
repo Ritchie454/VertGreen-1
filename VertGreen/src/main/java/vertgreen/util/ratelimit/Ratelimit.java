@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package vertgreen.util.ratelimit;
 
 import vertgreen.VertGreen;
@@ -9,6 +33,14 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Created by napster on 17.04.17.
+ * <p>
+ * This class uses an algorithm based on leaky bucket, but is optimized, mainly we work around having tons of threads for
+ * each bucket filling/emptying it, instead saving timestamps. As a result this class works better for shorter time
+ * periods, as the amount of timestamps to hold decreases.
+ * some calculations can be found here: https://docs.google.com/spreadsheets/d/1Afdn25AsFD-v3WQGp56rfVwO1y2d105IQk3dtfTcKwA/edit#gid=0
+ */
 public class Ratelimit {
 
     public enum Scope {USER, GUILD}
@@ -31,6 +63,13 @@ public class Ratelimit {
         return clazz;
     }
 
+    /**
+     * @param userWhiteList whitelist of user that should never be rate limited or blacklisted by this object
+     * @param scope         on which scope this rate limiter shall operate
+     * @param maxRequests   how many maxRequests shall be possible in the specified time
+     * @param milliseconds  time in milliseconds, in which maxRequests shall be allowed
+     * @param clazz         the optional (=can be null) clazz of commands to be ratelimited by this ratelimiter
+     */
     public Ratelimit(Set<Long> userWhiteList, Scope scope, long maxRequests, long milliseconds, Class clazz) {
         this.limits = new Long2ObjectOpenHashMap<>();
 
@@ -45,6 +84,12 @@ public class Ratelimit {
         return isAllowed(invoker, weight, null, null);
     }
 
+    /**
+     * @return a RateResult object containing information whether the users request is rate limited or not and the reason for that
+     * <p>
+     * Caveat: This allows requests to overstep the ratelimit with single high weight requests.
+     * The clearing of timestamps ensures it will take longer for them to get available again though.
+     */
     public boolean isAllowed(Member invoker, int weight, Blacklist blacklist, TextChannel blacklistOutput) {
         //This gets called real often, right before every command execution. Keep it light, don't do any blocking stuff,
         //ensure whatever you do in here is threadsafe, but minimize usage of synchronized as it adds overhead
@@ -92,6 +137,10 @@ public class Ratelimit {
         return false;
     }
 
+    /**
+     * Notifies the autoblacklist that a user has hit a limit, and handles the response of the blacklist
+     * Best run async as the blacklist might be hitting a database
+     */
     private void bannerinoUserino(Member invoker, Blacklist blacklist, TextChannel channel) {
         long length = blacklist.hitRateLimit(invoker.getUser().getIdLong());
         if (length <= 0) {
@@ -103,6 +152,10 @@ public class Ratelimit {
         channel.sendMessage(invoker.getAsMention() + ": " + out).queue();
     }
 
+
+    /**
+     * synchronize the creation of new Rate objects
+     */
     private synchronized Rate getOrCreateRate(long id) {
         //was one created on the meantime? use that
         Rate result = limits.get(id);
@@ -114,6 +167,9 @@ public class Ratelimit {
         return result;
     }
 
+    /**
+     * completely resets a limit for an id (user or guild for example)
+     */
     public synchronized void liftLimit(long id) {
         limits.remove(id);
     }

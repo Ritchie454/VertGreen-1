@@ -19,6 +19,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### OSX ###
+
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Thumbnails
 ._*
 
@@ -126,6 +132,3 @@ target/
 /music_persistence/
 /bootloader.json
 gc-*.log
-config.json
-package.json
-/nbproject/

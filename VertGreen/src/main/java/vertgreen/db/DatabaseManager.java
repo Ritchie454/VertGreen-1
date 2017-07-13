@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.db;
 
 import com.jcraft.jsch.JSch;
@@ -22,6 +47,7 @@ public class DatabaseManager {
     private Session sshTunnel;
     private DatabaseState state = DatabaseState.UNINITIALIZED;
 
+    //local port, if using SSH tunnel point your jdbc to this, e.g. jdbc:postgresql://localhost:9333/...
     private static final int SSH_TUNNEL_PORT = 9333;
 
     private String jdbcUrl;
@@ -39,7 +65,11 @@ public class DatabaseManager {
         this.poolSize = poolSize;
     }
 
-    
+    /**
+     * Starts the database connection.
+     *
+     * @throws IllegalStateException if trying to start a database that is READY or INITIALIZING
+     */
     public synchronized void startup() {
         if (state == DatabaseState.READY || state == DatabaseState.INITIALIZING) {
             throw new IllegalStateException("Can't start the database, when it's current state is " + state);
@@ -55,6 +85,7 @@ public class DatabaseManager {
                 }
             }
 
+            //These are now located in the resources directory as XML
             Properties properties = new Properties();
             properties.put("configLocation", "hibernate.cfg.xml");
 
@@ -63,13 +94,21 @@ public class DatabaseManager {
             if (dialect != null && !"".equals(dialect)) properties.put("hibernate.dialect", dialect);
             properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
 
+            //this does a lot of logs
+            //properties.put("hibernate.show_sql", "true");
+
+            //automatically update the tables we need
+            //caution: only add new columns, don't remove or alter old ones, otherwise manual db table migration needed
             properties.put("hibernate.hbm2ddl.auto", "update");
 
             properties.put("hibernate.hikari.maximumPoolSize", Integer.toString(poolSize));
 
+            //how long to wait for a connection becoming available, also the timeout when a DB fails
             properties.put("hibernate.hikari.connectionTimeout", Integer.toString(Config.HIKARI_TIMEOUT_MILLISECONDS));
-            properties.put("hibernate.hikari.dataSource.ApplicationName", "VertGreen_" + Config.CONFIG.getDistribution());
+            //this helps with sorting out connections in pgAdmin
+            properties.put("hibernate.hikari.dataSource.ApplicationName", "FredBoat_" + Config.CONFIG.getDistribution());
 
+            //timeout the validation query (will be done automatically through Connection.isValid())
             properties.put("hibernate.hikari.validationTimeout", "1000");
 
 
@@ -81,6 +120,7 @@ public class DatabaseManager {
             emfb.setPersistenceProviderClass(HibernatePersistenceProvider.class);
             emfb.afterPropertiesSet();
 
+            //leak prevention, close existing factory if possible
             closeEntityManagerFactory();
 
             emf = emfb.getObject();
@@ -157,10 +197,19 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Please call close() on the EntityManager object you receive after you are done to let the pool recycle the
+     * connection and save the nature from environmental toxins like open database connections.
+     */
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
+    /**
+     * Performs health checks on the ssh tunnel and database
+     *
+     * @return true if the database is operational, false if not
+     */
     public boolean isAvailable() {
         if (state != DatabaseState.READY) {
             return false;
@@ -179,6 +228,9 @@ public class DatabaseManager {
         return state == DatabaseState.READY;
     }
 
+    /**
+     * Avoid multiple threads calling a close on the factory by wrapping it into this synchronized method
+     */
     private synchronized void closeEntityManagerFactory() {
         if (emf != null && emf.isOpen()) {
             try {
@@ -201,6 +253,9 @@ public class DatabaseManager {
         SHUTDOWN
     }
 
+    /**
+     * Shutdown, close, stop, halt, burn down all resources this object has been using
+     */
     public void shutdown() {
         log.info("DatabaseManager shutdown call received, shutting down");
         state = DatabaseState.SHUTDOWN;

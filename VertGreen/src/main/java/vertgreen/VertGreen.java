@@ -1,3 +1,28 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -17,20 +42,20 @@ import vertgreen.commandmeta.init.MainCommandInitializer;
 import vertgreen.commandmeta.init.MusicCommandInitializer;
 import vertgreen.db.DatabaseManager;
 import vertgreen.event.EventListenerGreen;
-import vertgreen.event.EventListenerVert;
-import vertgreen.event.EventLogger;
+import vertgreen.event.EventListenerSelf;
 import vertgreen.event.ShardWatchdogListener;
 import vertgreen.feature.I18n;
-import vertgreen.util.DistributionEnum;
+import vertgreen.util.constant.DistributionEnum;
 import vertgreen.util.log.SimpleLogToSLF4JAdapter;
 import frederikam.jca.JCA;
 import frederikam.jca.JCABuilder;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.ISnowflake;
 import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.EventListener;
@@ -43,18 +68,16 @@ import org.slf4j.LoggerFactory;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import vertgreen.util.BotConstants;
 
 public abstract class VertGreen {
 
     private static final Logger log = LoggerFactory.getLogger(VertGreen.class);
-    
+
     static final int SHARD_CREATION_SLEEP_INTERVAL = 5100;
 
     private static final ArrayList<VertGreen> shards = new ArrayList<>();
@@ -63,8 +86,7 @@ public abstract class VertGreen {
     public static final int UNKNOWN_SHUTDOWN_CODE = -991023;
     public static int shutdownCode = UNKNOWN_SHUTDOWN_CODE;//Used when specifying the intended code for shutdown hooks
     static EventListenerGreen listenerBot;
-    static EventListenerVert listenerSelf;
-    static EventLogger eventlogger;
+    static EventListenerSelf listenerSelf;
     ShardWatchdogListener shardWatchdogListener = null;
     private static AtomicInteger numShardsReady = new AtomicInteger(0);
 
@@ -85,17 +107,18 @@ public abstract class VertGreen {
     private boolean hasReadiedOnce = false;
 
     public static void main(String[] args) throws LoginException, IllegalArgumentException, InterruptedException, IOException, UnirestException {
-        Runtime.getRuntime().addShutdownHook(new Thread(ON_SHUTDOWN, "Vert main shutdownhook"));
-        
+        Runtime.getRuntime().addShutdownHook(new Thread(ON_SHUTDOWN, "VertGreen main shutdownhook"));
+
         log.info("\n\n" +
-                "__       __           _      ______\n" +
-                "\\ \\     / /          | |    / _____\\\n" +
-                " \\ \\   / / ___  _ __ | |_  / /   ___  _ __   ___   ___  _ ___\n" +
-                "  \\ \\ / / / _ \\| '__|| __|| |   |__ || '__| / _ \\ / _ \\| '_  |\n" +
-                "   \\ v / |  __/| |   | |_  \\ \\____/ /| |   |  __/|  __/| | | |\n" +
-                "    \\_/   \\___||_|    \\__|  \\______/ |_|    \\___| \\___||_| |_|\n\n" +
-                "Distribution: " + BotConstants.RELEASE + "\n" +
-                "Version: " + BotConstants.VERSION + "\n");
+                " __     __                       __       ______                                          \n" +
+                "|  \\   |  \\                     |  \\     /      \\                                         \n" +
+                "| $$   | $$  ______    ______  _| $$_   |  $$$$$$\\  ______    ______    ______   _______  \n" +
+                "| $$   | $$ /      \\  /      \\|   $$ \\  | $$ __\\$$ /      \\  /      \\  /      \\ |       \\ \n" +
+                " \\$$\\ /  $$|  $$$$$$\\|  $$$$$$\\\\$$$$$$  | $$|    \\|  $$$$$$\\|  $$$$$$\\|  $$$$$$\\| $$$$$$$\\\n" +
+                "  \\$$\\  $$ | $$    $$| $$   \\$$ | $$ __ | $$ \\$$$$| $$   \\$$| $$    $$| $$    $$| $$  | $$\n" +
+                "   \\$$ $$  | $$$$$$$$| $$       | $$|  \\| $$__| $$| $$      | $$$$$$$$| $$$$$$$$| $$  | $$\n" +
+                "    \\$$$    \\$$     \\| $$        \\$$  $$ \\$$    $$| $$       \\$$     \\ \\$$     \\| $$  | $$\n" +
+                "     \\$      \\$$$$$$$ \\$$         \\$$$$   \\$$$$$$  \\$$        \\$$$$$$$  \\$$$$$$$ \\$$   \\$$");
 
         I18n.start();
 
@@ -109,7 +132,7 @@ public abstract class VertGreen {
         try {
             scope = Integer.parseInt(args[0]);
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException ignored) {
-            log.warn("Invalid scope, defaulting to scopes 0x111");
+            log.info("Invalid scope, defaulting to scopes 0x111");
             scope = 0x111;
         }
 
@@ -125,7 +148,7 @@ public abstract class VertGreen {
         try {
             API.start();
         } catch (Exception e) {
-            log.warn("Failed to ignite Spark, API unavailable", e);
+            log.info("Failed to ignite Spark, VertGreen API unavailable", e);
         }
 
         if (!Config.CONFIG.getJdbcUrl().equals("")) {
@@ -150,13 +173,12 @@ public abstract class VertGreen {
                 log.warn("No oauth secret found, skipped initialization of OAuth2 client");
             }
         } catch (Exception e) {
-            log.warn("Failed to start OAuth2 client", e);
+            log.info("Failed to start OAuth2 client", e);
         }
 
         //Initialise event listeners
         listenerBot = new EventListenerGreen();
-        listenerSelf = new EventListenerVert();
-        eventlogger = new EventLogger();
+        listenerSelf = new EventListenerSelf();
 
         //Commands
         if(Config.CONFIG.getDistribution() == DistributionEnum.DEVELOPMENT
@@ -186,8 +208,8 @@ public abstract class VertGreen {
         }
 
         if ((Config.CONFIG.getScope() & 0x001) != 0) {
-            log.warn("Selfbot support has been removed.");
-            //fbClient = new VertGreenClient();
+            log.error("Selfbot support has been removed.");
+            //vgClient = new VertGreenClient();
         }
 
         if (Config.CONFIG.getDistribution() == DistributionEnum.MUSIC && Config.CONFIG.getCarbonKey() != null) {
@@ -212,7 +234,7 @@ public abstract class VertGreen {
                 result = false;
             }
         } catch (Exception e) {
-            log.warn("Error when starting JCA", e);
+            log.error("Error when starting JCA", e);
             result = false;
         }
         return result;
@@ -220,7 +242,7 @@ public abstract class VertGreen {
 
     private static boolean hasValidMALLogin() {
         if ("".equals(Config.CONFIG.getMalUser()) || "".equals(Config.CONFIG.getMalPassword())) {
-            log.warn("MAL credentials not found. MAL related commands will not be available.");
+            log.info("MAL credentials not found. MAL related commands will not be available.");
             return false;
         }
         try {
@@ -242,7 +264,7 @@ public abstract class VertGreen {
 
     private static boolean hasValidImgurCredentials() {
         if ("".equals(Config.CONFIG.getImgurClientId())) {
-            log.warn("Imgur credentials not found. Commands relying on Imgur will not work properly.");
+            log.info("Imgur credentials not found. Commands relying on Imgur will not work properly.");
             return false;
         }
         try {
@@ -303,7 +325,7 @@ public abstract class VertGreen {
         }
 
         log.info("Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString());
-        getTextChannelById("332940748905512960").sendMessage(":rocket: Received ready event for " + VertGreen.getInstance(readyEvent.getJDA()).getShardInfo().getShardString()).queue();
+
         int ready = numShardsReady.get();
         if (ready == Config.CONFIG.getNumShards()) {
             log.info("All " + ready + " shards are ready.");
@@ -338,8 +360,8 @@ public abstract class VertGreen {
             log.error("Critical error while handling music persistence.", e);
         }
 
-        for(VertGreen vg : shards) {
-            vg.getJda().shutdown(false);
+        for(VertGreen fb : shards) {
+            fb.getJda().shutdown(false);
         }
 
         try {
@@ -361,7 +383,7 @@ public abstract class VertGreen {
         return listenerBot;
     }
 
-    public static EventListenerVert getListenerSelf() {
+    public static EventListenerSelf getListenerSelf() {
         return listenerSelf;
     }
 
@@ -378,28 +400,61 @@ public abstract class VertGreen {
     public static List<Guild> getAllGuilds() {
         ArrayList<Guild> list = new ArrayList<>();
 
-        for (VertGreen vg : shards) {
-            list.addAll(vg.getJda().getGuilds());
+        for (VertGreen fb : shards) {
+            list.addAll(fb.getJda().getGuilds());
         }
 
         return list;
     }
 
-    public static Map<String, User> getAllUsersAsMap() {
-        HashMap<String, User> map = new HashMap<>();
+    public static int countAllGuilds() {
+        return Collections.unmodifiableCollection(shards)
+                .stream()
+                .mapToInt(shard -> shard.getJda().getGuilds().size())
+                .sum();
+    }
 
-        for (VertGreen vg : shards) {
-            for (User usr : vg.getJda().getUsers()) {
-                map.put(usr.getId(), usr);
-            }
+    //this probably takes horribly long and should be solved in a different way
+    //rewrite it when we actually come up with a use case for needing all user objects
+//    @Deprecated
+//    public static Map<String, User> getAllUsersAsMap() {
+//        HashMap<String, User> map = new HashMap<>();
+//
+//        for (VertGreen fb : shards) {
+//            for (User usr : fb.getJda().getUsers()) {
+//                map.put(usr.getId(), usr);
+//            }
+//        }
+//        return map;
+//    }
+
+    private static int biggestUserCount = -1;
+
+    //IMPORTANT: do not use this for actually counting, it will not be accurate; it is meant to be used to initialize
+    // sets or maps that are about to hold all those user values
+    public static int getExpectedUserCount() {
+        if (biggestUserCount <= 0) { //initialize
+            countAllUniqueUsers();
         }
+        return biggestUserCount;
+    }
 
-        return map;
+    public static long countAllUniqueUsers() {
+        int expected = biggestUserCount > 0 ? biggestUserCount : LongOpenHashSet.DEFAULT_INITIAL_SIZE;
+        LongOpenHashSet uniqueUsers = new LongOpenHashSet(expected + 100000); //add 100k for good measure
+        Collections.unmodifiableCollection(shards).forEach(
+                shard -> shard.getJda().getUsers().parallelStream().mapToLong(ISnowflake::getIdLong).forEach(uniqueUsers::add)
+        );
+        //never shrink the user count (might happen due to not connected shards)
+        if (uniqueUsers.size() > biggestUserCount) {
+            biggestUserCount = uniqueUsers.size();
+        }
+        return uniqueUsers.size();
     }
 
     public static TextChannel getTextChannelById(String id) {
-        for (VertGreen vg : shards) {
-            for (TextChannel channel : vg.getJda().getTextChannels()) {
+        for (VertGreen fb : shards) {
+            for (TextChannel channel : fb.getJda().getTextChannels()) {
                 if(channel.getId().equals(id)) return channel;
             }
         }
@@ -408,8 +463,8 @@ public abstract class VertGreen {
     }
 
     public static VoiceChannel getVoiceChannelById(String id) {
-        for (VertGreen vg : shards) {
-            for (VoiceChannel channel : vg.getJda().getVoiceChannels()) {
+        for (VertGreen fb : shards) {
+            for (VoiceChannel channel : fb.getJda().getVoiceChannels()) {
                 if(channel.getId().equals(id)) return channel;
             }
         }
@@ -427,9 +482,9 @@ public abstract class VertGreen {
         } else {
             int sId = jda.getShardInfo() == null ? 0 : jda.getShardInfo().getShardId();
 
-            for(VertGreen vg : shards) {
-                if(((VertGreenBot) vg).getShardId() == sId) {
-                    return vg;
+            for(VertGreen fb : shards) {
+                if(((VertGreenBot) fb).getShardId() == sId) {
+                    return fb;
                 }
             }
         }

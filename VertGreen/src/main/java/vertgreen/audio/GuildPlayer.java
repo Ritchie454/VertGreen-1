@@ -1,20 +1,42 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.audio;
 
-import vertgreen.audio.queue.AudioLoader;
-import vertgreen.audio.queue.RepeatMode;
-import vertgreen.audio.queue.AudioTrackContext;
-import vertgreen.audio.queue.AbstractTrackProvider;
-import vertgreen.audio.queue.IdentifierContext;
-import vertgreen.audio.queue.SimpleTrackProvider;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import vertgreen.VertGreen;
+import vertgreen.audio.queue.*;
 import vertgreen.commandmeta.MessagingException;
 import vertgreen.db.DatabaseNotReadyException;
 import vertgreen.db.EntityReader;
 import vertgreen.db.entity.GuildConfig;
 import vertgreen.feature.I18n;
+import vertgreen.perms.PermissionLevel;
+import vertgreen.perms.PermsUtil;
 import vertgreen.util.TextUtils;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.Permission;
@@ -64,6 +86,10 @@ public class GuildPlayer extends AbstractPlayer {
         if (targetChannel == null) {
             throw new MessagingException(I18n.get(getGuild()).getString("playerUserNotInChannel"));
         }
+        if (targetChannel.equals(getChannel())) {
+            // already connected to the channel
+            return;
+        }
 
         if (!targetChannel.getGuild().getSelfMember().hasPermission(targetChannel, Permission.VOICE_CONNECT)
                 && !targetChannel.getMembers().contains(getGuild().getSelfMember())) {
@@ -77,6 +103,8 @@ public class GuildPlayer extends AbstractPlayer {
         AudioManager manager = getGuild().getAudioManager();
 
         manager.openAudioConnection(targetChannel);
+
+        manager.setConnectionListener(new DebugConnectionListener(guildId, shard.getShardInfo()));
 
         log.info("Connected to voice channel " + targetChannel);
     }
@@ -250,7 +278,7 @@ public class GuildPlayer extends AbstractPlayer {
     /**
      * @return currently used TextChannel or null if there is none
      */
-    public TextChannel getCurrentTC() {
+    private TextChannel getCurrentTC() {
         try {
             return shard.getJda().getTextChannelById(currentTCId);
         } catch (IllegalArgumentException e) {
@@ -260,7 +288,7 @@ public class GuildPlayer extends AbstractPlayer {
 
     //Success, fail message
     public Pair<Boolean, String> canMemberSkipTracks(TextChannel textChannel, Member member, List<AudioTrackContext> list) {
-        if (member.hasPermission(textChannel, Permission.MESSAGE_MANAGE)) {
+        if (PermsUtil.checkPerms(PermissionLevel.DJ, member)) {
             return new ImmutablePair<>(true, null);
         } else {
             //We are not a mod
@@ -270,7 +298,7 @@ public class GuildPlayer extends AbstractPlayer {
                 if(!atc.getMember().equals(member)) otherPeoplesTracks++;
             }
 
-            if (otherPeoplesTracks > 1) {
+            if (otherPeoplesTracks > 0) {
                 return new ImmutablePair<>(false, I18n.get(getGuild()).getString("skipDeniedTooManyTracks"));
             } else {
                 return new ImmutablePair<>(true, null);

@@ -1,12 +1,47 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 Frederik Ar. Mikkelsen
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
+
 package vertgreen.util;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import vertgreen.Config;
+import vertgreen.util.constant.BotConstants;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
-import net.dv8tion.jda.core.requests.*;
+import net.dv8tion.jda.core.requests.Request;
+import net.dv8tion.jda.core.requests.Requester;
+import net.dv8tion.jda.core.requests.Response;
+import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.core.requests.Route;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +51,9 @@ import java.util.List;
 public class DiscordUtil {
 
     private static final Logger log = LoggerFactory.getLogger(DiscordUtil.class);
+    private static final String USER_AGENT = "VertGreen DiscordBot (https://github.com/Frederikam/VertGreen, 1.0)";
 
-    private static final String USER_AGENT = "FredBoat DiscordBot (https://github.com/Frederikam/FredBoat, 1.0)";
+    private static String cachedOwnerId = null;
 
     private DiscordUtil() {
     }
@@ -46,34 +82,16 @@ public class DiscordUtil {
         return (conf.getScope() & 0x001) != 0;
     }
 
-    public static boolean isUserBotOwner(User user) {
-        return getOwnerId(user.getJDA()).equals(user.getId());
-    }
-
     public static String getOwnerId(JDA jda) {
+        if (cachedOwnerId != null) return cachedOwnerId;
+
         try {
-            return getApplicationInfo(jda.getToken().substring(4)).getJSONObject("owner").getString("id");
+            cachedOwnerId = getApplicationInfo(jda.getToken().substring(4)).getJSONObject("owner").getString("id");
         } catch (UnirestException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    public static boolean isUserBotCommander(Member member) {
-        return isUserBotCommander(member.getGuild(), member.getUser());
-    }
-
-    public static boolean isUserBotCommander(Guild guild, User user) {
-        Member member = guild.getMember(user);
-        if (member == null) return false;
-        List<Role> roles = member.getRoles();
-
-        for (Role r : roles) {
-            if (r.getName().equals("Bot Commander")) {
-                return true;
-            }
-        }
-
-        return false;
+        return cachedOwnerId;
     }
 
     public static int getHighestRolePosition(Member member) {
@@ -122,17 +140,18 @@ public class DiscordUtil {
 
     public static User getUserFromBearer(JDA jda, String token) {
         try {
-            JSONObject user =  Unirest.get(Requester.DISCORD_API_PREFIX + "/users/@me")
+            JSONObject user = Unirest.get(Requester.DISCORD_API_PREFIX + "/users/@me")
                     .header("Authorization", "Bearer " + token)
                     .header("User-agent", USER_AGENT)
                     .asJson()
                     .getBody()
                     .getObject();
 
-            if(user.has("id")){
+            if (user.has("id")) {
                 return jda.retrieveUserById(user.getString("id")).complete(true);
             }
-        } catch (UnirestException | RateLimitedException ignored) {}
+        } catch (UnirestException | RateLimitedException ignored) {
+        }
 
         return null;
     }
