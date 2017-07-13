@@ -124,10 +124,10 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
     }
 
     public void getMemory(){
-        Long TotMem = Runtime.getRuntime().totalMemory() / 1048576;
-        Long FreeMem = Runtime.getRuntime().freeMemory() / 1048576;
-        Long MaxMem = Runtime.getRuntime().maxMemory() / 1048576;
-        Long CurrMem = TotMem / FreeMem;
+        Long TotMem = Runtime.getRuntime().totalMemory() / 1000000;
+        Long FreeMem = Runtime.getRuntime().freeMemory() / 1000000;
+        Long MaxMem = Runtime.getRuntime().maxMemory() / 1000000;
+        Long CurrMem = TotMem - FreeMem;
         if (CurrMem > 750) {
             eb.setFooter("Warning, High memory usage!", "https://cdn.discordapp.com/emojis/313956276893646850.png");
             eb.setColor(Color.RED);
