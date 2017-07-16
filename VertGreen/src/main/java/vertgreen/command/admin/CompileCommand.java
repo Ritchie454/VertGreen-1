@@ -56,7 +56,7 @@ public class CompileCommand extends Command implements ICommand, ICommandRestric
             Runtime rt = Runtime.getRuntime();
             Message msg;
             msg = channel.sendMessage("Compiling Update...").complete(true);
-            eb.setTitle("<:Tools1:333308311443341313>Running `mvn package shade:shade`... ");
+            eb.setTitle("<:ntools:336195783735115776> Packaging VertGreen.jar");
             channel.sendMessage(eb.build()).queue();
             File updateDir = new File("update/VertGreen");
 
@@ -71,7 +71,7 @@ public class CompileCommand extends Command implements ICommand, ICommandRestric
                 msg = msg.editMessage(msg.getRawContent() + "[:anger: returned code " + mvnBuild.exitValue() + "]\n\n").complete(true);
                 throw new RuntimeException("Bad response code");
             }
-            eb2.setTitle("<:White_check_mark:333308311443341313>Succeeded packaging VertGreen.jar");
+            eb2.setTitle("<:check_mark:336196608259653633> Succeeded packaging VertGreen.jar");
             channel.sendMessage(eb2.build()).queue();
 
             if (!new File("./update/VertGreen/target/VertGreen-1.0.jar").renameTo(new File("./VertGreen-1.0.jar"))) {

@@ -59,7 +59,7 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
             EmbedBuilder eb = new EmbedBuilder();
             EmbedBuilder eb2 = new EmbedBuilder();
             msg = channel.sendMessage("Downloading Update...").complete(true);
-            eb.setTitle("<:Download:333308311443341313>Running `git clone`...");
+            eb.setTitle("<:download:336195782635945984> Downloading Update from Github");
             channel.sendMessage(eb.build()).queue();
             String branch = "master";
             if (args.length > 1) {
@@ -89,7 +89,7 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
                 msg = msg.editMessage(msg.getRawContent() + "[:anger: returned code " + gitClone.exitValue() + "]\n\n").complete(true);
                 throw new RuntimeException("Bad response code");
             }
-            eb2.setTitle("<:White_check_mark:333308311443341313>Succeeded pulling update from GitHub");
+            eb2.setTitle("<:check_mark:336196608259653633> Succeeded downloading update from GitHub");
             channel.sendMessage(eb2.build()).queue();
         } catch (InterruptedException | IOException | RateLimitedException ex) {
             throw new RuntimeException(ex);
