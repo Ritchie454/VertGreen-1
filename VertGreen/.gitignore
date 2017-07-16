@@ -6,3 +6,5 @@
 /credentials.json.old
 *.ppk
 vertgreen.db
+config.yaml
+log.txt

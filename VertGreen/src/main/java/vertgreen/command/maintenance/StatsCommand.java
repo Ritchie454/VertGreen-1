@@ -109,7 +109,7 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
 
     public void getVersion(Guild guild){
         eb.setColor(BotConstants.VERTGREEN_COLOR);
-        eb.addField("<:partner:314068430556758017> Version Info", "JDA responses total: " + guild.getJDA().getResponseTotal() + "\n" + "JDA version: " + JDAInfo.VERSION + "\n" + "Lavaplayer version: " + PlayerLibrary.VERSION + "\n", true);
+        eb.addField("<:Partner:333308311443341313> Version Info", "JDA responses total: " + guild.getJDA().getResponseTotal() + "\n" + "JDA version: " + JDAInfo.VERSION + "\n" + "Lavaplayer version: " + PlayerLibrary.VERSION + "\n", true);
         GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
         eb.setFooter("Rev: " + gitRepoState.describe, "https://cdn.discordapp.com/emojis/314068430787706880.png");
     }
@@ -120,7 +120,7 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
         String status = "Status: " + jda.getStatus() + "\n";
         String ping = "Ping: " + jda.getPing() + "ms\n";
         String guildn = "Guild: " + guild.getName() +"\n";
-        eb.addField("<:online:313956277808005120> Connection Info" , status + ping + guildn, true);
+        eb.addField("<:Online:333308311443341313> Connection Info" , status + ping + guildn, true);
     }
 
     public void getMemory(){
@@ -138,11 +138,11 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
             eb.setFooter("Low memory usage", "https://cdn.discordapp.com/emojis/313956277808005120.png");
             eb.setColor(Color.GREEN);
         }
-        eb.addField("<:stafftools:314348604095594498> Memory Info", "Reserved memory: " + TotMem + "MB\n" + "-> Of which is used: " + CurrMem + "MB\n" + "-> Of which is free: " + FreeMem + "MB\n" + "Max reservable: " + MaxMem + "MB\n", true);
+        eb.addField("<:Tools2:333308311443341313> Memory Info", "Reserved memory: " + TotMem + "MB\n" + "-> Of which is used: " + CurrMem + "MB\n" + "-> Of which is free: " + FreeMem + "MB\n" + "Max reservable: " + MaxMem + "MB\n", true);
     }
 
     public void getShardInfo(Guild guild){
         eb.setColor(BotConstants.VERTGREEN_COLOR);
-        eb.addField("<:hypesquad:314068430854684672> Shard Info","Sharding: " + VertGreen.getInstance(guild.getJDA()).getShardInfo().getShardString() + "\n" + "Players playing: " + PlayerRegistry.getPlayingPlayers().size() + "\n" + "Known servers: " + VertGreen.getAllGuilds().size() + "\n" + "Known users in servers: " + VertGreen.countAllUniqueUsers() + "\n" , true);
+        eb.addField("<:HypeSquad:333308311443341313> Shard Info","Sharding: " + VertGreen.getInstance(guild.getJDA()).getShardInfo().getShardString() + "\n" + "Players playing: " + PlayerRegistry.getPlayingPlayers().size() + "\n" + "Known servers: " + VertGreen.getAllGuilds().size() + "\n" + "Known users in servers: " + VertGreen.countAllUniqueUsers() + "\n" , true);
     }
 }

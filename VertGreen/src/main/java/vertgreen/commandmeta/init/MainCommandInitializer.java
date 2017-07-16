@@ -78,6 +78,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("mal", new MALCommand());
         CommandRegistry.registerCommand("serverinfo", new vertgreen.command.util.ServerInfoCommand(), "guildinfo");
         CommandRegistry.registerCommand("userinfo", new vertgreen.command.util.UserInfoCommand(), "memberinfo");
+        CommandRegistry.registerCommand("steamgame", new SteamGameCommand());
     }
 
 }
