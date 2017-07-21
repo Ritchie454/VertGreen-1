@@ -28,10 +28,13 @@ package vertgreen.command.admin;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import vertgreen.VertGreen;
+import vertgreen.command.fun.RandomImageCommand;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.commandmeta.abs.ICommand;
 import vertgreen.commandmeta.abs.ICommandRestricted;
 import vertgreen.perms.PermissionLevel;
+import vertgreen.util.GitRepoState;
+import vertgreen.util.TextUtils;
 import vertgreen.util.constant.ExitCodes;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -42,15 +45,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vertgreen.util.log.SLF4JInputStreamErrorLogger;
 import vertgreen.util.log.SLF4JInputStreamLogger;
-
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UpdateCommand extends Command implements ICommand, ICommandRestricted {
 
     private static final Logger log = LoggerFactory.getLogger(UpdateCommand.class);
-
+    private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(git@|https?://)(.+)[:/](.+)/(.+).git$");
+    private RandomImageCommand octocats = new RandomImageCommand("https://imgur.com/a/sBkTj");
+    
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
         try {
@@ -91,14 +101,63 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
             }
             eb2.setTitle("<:check_mark:336196608259653633> Succeeded downloading update from GitHub");
             channel.sendMessage(eb2.build()).queue();
+
         } catch (InterruptedException | IOException | RateLimitedException ex) {
             throw new RuntimeException(ex);
+        }
+        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
+        if (gitRepoState == null) {
+            TextUtils.replyWithName(channel, invoker, "This build has does not contain any git meta information");
+            return;
+        }
+
+        String url = getGithubCommitLink();
+        //times look like this: 31.05.2017 @ 01:17:17 CEST
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy @ hh:mm:ss z");
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Build & git info", url);
+        embedBuilder.addField("Commit info", gitRepoState.describe + "\n\n" + gitRepoState.commitMessageFull, false);
+        embedBuilder.addField("Commit timestamp", gitRepoState.commitTime, false);
+        embedBuilder.addField("Commit on Github", url, false);
+
+        embedBuilder.addField("Branch", gitRepoState.branch, true);
+        embedBuilder.addField("Built by", "<@!197063812027908097>", true);
+
+        embedBuilder.setColor(new Color(240, 81, 51));//git-scm color
+        embedBuilder.setThumbnail(octocats.getRandomImageUrl());//github octocat thumbnail
+
+        try {
+            Date built = sdf.parse(gitRepoState.buildTime);
+            embedBuilder.setTimestamp(built.toInstant());
+            embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
+        } catch (ParseException ignored) {
         }
     }
 
     @Override
     public String help(Guild guild) {
         return "{0}{1} [branch [repo]]\n#Update the bot by checking out the provided branch from the provided github repo.";
+    }
+
+    private String getGithubCommitLink() {
+        String result = "Could not find or create a valid Github url.";
+        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
+        if (gitRepoState != null) {
+            String originUrl = gitRepoState.remoteOriginUrl;
+
+            Matcher m = GITHUB_URL_PATTERN.matcher(originUrl);
+
+            if (m.find()) {
+                String domain = m.group(2);
+                String user = m.group(3);
+                String repo = m.group(4);
+                String commitId = gitRepoState.commitId;
+
+                result = "https://" + domain + "/" + user + "/" + repo + "/commit/" + commitId;
+            }
+        }
+        return result;
     }
 
     @Override
