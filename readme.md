@@ -1,6 +1,7 @@
 # VertGreen  [![Dependency Status](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e/badge.svg)](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e)
 
 Vert is a selfhosted and highly modified version of the discord bot FredBoat (A music bot), It is designed to be completely lag free too! You can activate the bot using <<help
+
 You can donate on Patron below!
 
 [![Donate](https://kurozu.me/DonateButton.png)](https://www.patreon.com/VertGreen)
