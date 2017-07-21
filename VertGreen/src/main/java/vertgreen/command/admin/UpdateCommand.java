@@ -26,6 +26,7 @@
 package vertgreen.command.admin;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import vertgreen.VertGreen;
 import vertgreen.command.fun.RandomImageCommand;
@@ -60,7 +61,7 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
     private static final Logger log = LoggerFactory.getLogger(UpdateCommand.class);
     private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(git@|https?://)(.+)[:/](.+)/(.+).git$");
     private RandomImageCommand octocats = new RandomImageCommand("https://imgur.com/a/sBkTj");
-    
+
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
         try {
@@ -105,11 +106,8 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
         } catch (InterruptedException | IOException | RateLimitedException ex) {
             throw new RuntimeException(ex);
         }
+
         GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
-        if (gitRepoState == null) {
-            TextUtils.replyWithName(channel, invoker, "This build has does not contain any git meta information");
-            return;
-        }
 
         String url = getGithubCommitLink();
         //times look like this: 31.05.2017 @ 01:17:17 CEST
@@ -133,6 +131,8 @@ public class UpdateCommand extends Command implements ICommand, ICommandRestrict
             embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
         } catch (ParseException ignored) {
         }
+        JDA jda = guild.getJDA();
+        jda.getTextChannelById("323605184016154635").sendMessage(embedBuilder.build()).queue();
     }
 
     @Override
