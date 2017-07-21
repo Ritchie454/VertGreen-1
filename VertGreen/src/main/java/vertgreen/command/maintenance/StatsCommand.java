@@ -55,6 +55,8 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
         String msg = message.getContent().replace(Config.CONFIG.getPrefix() + "stats", "");
         eb = new EmbedBuilder();
+        eb.setColor(Color.GREEN);
+        eb.setTitle("System Stats");
         switch (msg){
             case "":
                 getStats(guild);
@@ -108,7 +110,6 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
 
 
     public void getVersion(Guild guild){
-        eb.setColor(BotConstants.VERTGREEN_COLOR);
         eb.addField("<:partner:336195782589808641> Version Info", "JDA responses total: " + guild.getJDA().getResponseTotal() + "\n" + "JDA version: " + JDAInfo.VERSION + "\n" + "Lavaplayer version: " + PlayerLibrary.VERSION + "\n", true);
         GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
         eb.setFooter("Rev: " + gitRepoState.describe, "https://cdn.discordapp.com/emojis/314068430787706880.png");
@@ -116,7 +117,6 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
 
     public void getPing(Guild guild){
         JDA jda = guild.getJDA();
-        eb.setColor(BotConstants.VERTGREEN_COLOR);
         String status = "Status: " + jda.getStatus() + "\n";
         String ping = "Ping: " + jda.getPing() + "ms\n";
         String guildn = "Guild: " + guild.getName() +"\n";
@@ -142,7 +142,6 @@ public class StatsCommand extends Command implements IMaintenanceCommand {
     }
 
     public void getShardInfo(Guild guild){
-        eb.setColor(BotConstants.VERTGREEN_COLOR);
         eb.addField("<:hype_squad:336195782656917504> Shard Info","Sharding: " + VertGreen.getInstance(guild.getJDA()).getShardInfo().getShardString() + "\n" + "Players playing: " + PlayerRegistry.getPlayingPlayers().size() + "\n" + "Known servers: " + VertGreen.getAllGuilds().size() + "\n" + "Known users in servers: " + VertGreen.countAllUniqueUsers() + "\n" , true);
     }
 }

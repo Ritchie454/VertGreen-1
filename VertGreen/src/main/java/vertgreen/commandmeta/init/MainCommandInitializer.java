@@ -59,6 +59,7 @@ public class MainCommandInitializer {
         CommandRegistry.registerCommand("gitinfo", new GitInfoCommand(), "git");
         CommandRegistry.registerCommand("shards", new ShardsCommand());
         CommandRegistry.registerCommand("stats", new StatsCommand());
+        CommandRegistry.registerCommand("system", new SystemCommand());
         //MODERATION
         CommandRegistry.registerCommand("clear", new ClearCommand());
         CommandRegistry.registerCommand("config", new ConfigCommand(), "cfg");
