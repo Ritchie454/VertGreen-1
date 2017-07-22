@@ -25,20 +25,21 @@
 
 package vertgreen.command.admin;
 
-import net.dv8tion.jda.core.entities.*;
-import vertgreen.VertGreen;
 import vertgreen.audio.GuildPlayer;
 import vertgreen.audio.PlayerRegistry;
 import vertgreen.commandmeta.abs.Command;
 import vertgreen.util.TextUtils;
 import vertgreen.commandmeta.abs.ICommandRestricted;
 import vertgreen.perms.PermissionLevel;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
@@ -50,31 +51,81 @@ import java.util.concurrent.TimeoutException;
  */
 public class AnnounceCommand extends Command implements ICommandRestricted {
 
+    private static final Logger log = LoggerFactory.getLogger(AnnounceCommand.class);
+
+    private static final String HEAD = "__**[BROADCASTED MESSAGE]**__\n";
+
     @Override
     public void onInvoke(Guild guild, TextChannel channel, Member invoker, Message message, String[] args) {
+        List<GuildPlayer> players = PlayerRegistry.getPlayingPlayers();
+
+        if (players.isEmpty()) {
+            return;
+        }
         String input = message.getRawContent().substring(args[0].length() + 1);
+        String msg = HEAD + input;
 
         Message status;
         try {
-            status = channel.sendMessage("Sending Messages to guilds...").complete(true);
+            status = channel.sendMessage(String.format("[0/%d]", players.size())).complete(true);
         } catch (RateLimitedException e) {
+            log.error("annuoncement failed! Rate limits.", e);
+            TextUtils.handleException(e, channel, invoker);
             throw new RuntimeException(e);
         }
 
         new Thread(() -> {
-            try {
-                for (Guild g : VertGreen.getAllGuilds()) {
-                    g.getPublicChannel().sendMessage(input).queue();
-                }
-            } catch (Exception e) {
+            Phaser phaser = new Phaser(players.size());
+
+            for (GuildPlayer player : players) {
+                player.getActiveTextChannel().sendMessage(msg).queue(
+                        __ -> phaser.arrive(),
+                        __ -> phaser.arriveAndDeregister());
             }
-            status.editMessage("Messages Sent!\nAll guilds have been notified~").queue();
+
+            new Thread(() -> {
+                try {
+                    do {
+                        try {
+                            phaser.awaitAdvanceInterruptibly(0, 5, TimeUnit.SECONDS);
+                            // now all the parties have arrived, we can break out of the loop
+                            break;
+                        } catch (TimeoutException ex) {
+                            // this is fine, this means that the required parties haven't arrived
+                        }
+                        printProgress(status,
+                                phaser.getArrivedParties(),
+                                players.size(),
+                                players.size() - phaser.getRegisteredParties());
+                    } while (true);
+                    printDone(status,
+                            phaser.getRegisteredParties(), //phaser wraps back to 0 on phase increment
+                            players.size() - phaser.getRegisteredParties());
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt(); // restore interrupt flag
+                    log.error("interrupted", ex);
+                    throw new RuntimeException(ex);
+                }
+            }).start();
         }).start();
+    }
+
+    private static void printProgress(Message message, int done, int total, int error) {
+        message.editMessage(MessageFormat.format(
+                "[{0}/{1}]{2,choice,0#|0< {2} failed}",
+                done, total, error)
+        ).queue();
+    }
+    private static void printDone(Message message, int completed, int failed) {
+        message.editMessage(MessageFormat.format(
+                "{0} completed, {1} failed",
+                completed, failed)
+        ).queue();
     }
 
     @Override
     public String help(Guild guild) {
-        return "{0}{1}\n#Broadcasts an announcement to Guild TextChannels.";
+        return "{0}{1}\n#Broadcasts an announcement to GuildPlayer TextChannels.";
     }
 
     @Override

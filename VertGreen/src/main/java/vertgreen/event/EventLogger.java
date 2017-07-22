@@ -53,7 +53,6 @@ public class EventLogger extends ListenerAdapter {
     private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(git@|https?://)(.+)[:/](.+)/(.+).git$");
     private RandomImageCommand octocats = new RandomImageCommand("https://imgur.com/a/sBkTj");
     String msg;
-    String git;
     private final String logChannelId;
     private VertGreen shard;
 
@@ -62,54 +61,12 @@ public class EventLogger extends ListenerAdapter {
         Runtime.getRuntime().addShutdownHook(new Thread(ON_SHUTDOWN, EventLogger.class.getSimpleName() + " shutdownhook"));
     }
 
-    private void send(Message msg) {
-        send(msg.getRawContent());
-    }
-
-    private void send(String msg) {
-        /*JDA jda = shard.getJda(); //do a null check if you ever uncomment this code again
-        DiscordUtil.sendShardlessMessage(jda, logChannelId,
-                VertGreen.getInstance(jda).getShardInfo().getShardString()
-                + " "
-                + msg
-        );
-        log.info(msg);*/
-    }
-
     @Override
     public void onReady(ReadyEvent event) {
         VertGreen.getInstance(event.getJDA());
-        /*send(new MessageBuilder()
-                .append("[:rocket:] Received ready event.")
-                .build()
-        );*/
         msg = "[:rocket:] Received ready event.";
         event.getJDA().getTextChannelById("332940748905512960").sendMessage(msg).queue();
-        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
-
-        String url = getGithubCommitLink();
-        //times look like this: 31.05.2017 @ 01:17:17 CEST
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy @ hh:mm:ss z");
-
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setTitle("Build & git info", url);
-        embedBuilder.addField("Commit info", gitRepoState.describe + "\n\n" + gitRepoState.commitMessageFull, false);
-        embedBuilder.addField("Commit timestamp", gitRepoState.commitTime, false);
-        embedBuilder.addField("Commit on Github", url, false);
-
-        embedBuilder.addField("Branch", gitRepoState.branch, true);
-        embedBuilder.addField("Built by", "<@!197063812027908097>", true);
-
-        embedBuilder.setColor(new Color(240, 81, 51));//git-scm color
-        embedBuilder.setThumbnail(octocats.getRandomImageUrl());//github octocat thumbnail
-
-        try {
-            Date built = sdf.parse(gitRepoState.buildTime);
-            embedBuilder.setTimestamp(built.toInstant());
-            embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
-        } catch (ParseException ignored) {
-        }
-        event.getJDA().getTextChannelById("323605184016154635").sendMessage(embedBuilder.build()).queue();
+        getGitInfo(event);
     }
 
     @Override
@@ -155,6 +112,33 @@ public class EventLogger extends ListenerAdapter {
             }
         }
         return result;
+    }
+
+    private void getGitInfo(ReadyEvent event) {
+        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
+
+        String url = getGithubCommitLink();
+        //times look like this: 31.05.2017 @ 01:17:17 CEST
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy @ hh:mm:ss z");
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Build & git info", url);
+        embedBuilder.addField("Commit info", gitRepoState.describe + "\n\n" + gitRepoState.commitMessageFull, false);
+        embedBuilder.addField("Commit timestamp", gitRepoState.commitTime, false);
+        embedBuilder.addField("Commit on Github", url, false);
+
+        embedBuilder.addField("Branch", gitRepoState.branch, true);
+        embedBuilder.addField("Built by", "<@!197063812027908097>", true);
+
+        embedBuilder.setColor(new Color(240, 81, 51));//git-scm color
+        embedBuilder.setThumbnail(octocats.getRandomImageUrl());//github octocat thumbnail
+
+        try {
+            Date built = sdf.parse(gitRepoState.buildTime);
+            embedBuilder.setTimestamp(built.toInstant());
+            embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
+        } catch (ParseException ignored) {
+        }
+        event.getJDA().getTextChannelById("323605184016154635").sendMessage(embedBuilder.build()).queue();
     }
 
 }
