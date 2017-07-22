@@ -71,7 +71,7 @@ public class CompileCommand extends Command implements ICommand, ICommandRestric
                 msg = msg.editMessage(msg.getRawContent() + "[:anger: returned code " + mvnBuild.exitValue() + "]\n\n").complete(true);
                 throw new RuntimeException("Bad response code");
             }
-            eb2.setTitle("<:check_mark:336196608259653633> Succeeded packaging VertGreen.jar");
+            eb2.setTitle(":white_check_mark: Succeeded packaging VertGreen.jar");
             channel.sendMessage(eb2.build()).queue();
 
             if (!new File("./update/VertGreen/target/VertGreen-1.0.jar").renameTo(new File("./VertGreen-1.0.jar"))) {

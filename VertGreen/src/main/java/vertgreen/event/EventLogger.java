@@ -25,6 +25,7 @@
 
 package vertgreen.event;
 
+import net.dv8tion.jda.core.EmbedBuilder;
 import vertgreen.VertGreen;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -33,14 +34,26 @@ import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.JDA;
+import vertgreen.command.fun.RandomImageCommand;
 import vertgreen.util.DiscordUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vertgreen.util.GitRepoState;
+
+import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EventLogger extends ListenerAdapter {
 
     public static final Logger log = LoggerFactory.getLogger(EventLogger.class);
+    private static final Pattern GITHUB_URL_PATTERN = Pattern.compile("^(git@|https?://)(.+)[:/](.+)/(.+).git$");
+    private RandomImageCommand octocats = new RandomImageCommand("https://imgur.com/a/sBkTj");
     String msg;
+    String git;
     private final String logChannelId;
     private VertGreen shard;
 
@@ -70,6 +83,33 @@ public class EventLogger extends ListenerAdapter {
                 .append("[:rocket:] Received ready event.")
                 .build()
         );*/
+        msg = "[:rocket:] Received ready event.";
+        event.getJDA().getTextChannelById("332940748905512960").sendMessage(msg).queue();
+        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
+
+        String url = getGithubCommitLink();
+        //times look like this: 31.05.2017 @ 01:17:17 CEST
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy @ hh:mm:ss z");
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Build & git info", url);
+        embedBuilder.addField("Commit info", gitRepoState.describe + "\n\n" + gitRepoState.commitMessageFull, false);
+        embedBuilder.addField("Commit timestamp", gitRepoState.commitTime, false);
+        embedBuilder.addField("Commit on Github", url, false);
+
+        embedBuilder.addField("Branch", gitRepoState.branch, true);
+        embedBuilder.addField("Built by", "<@!197063812027908097>", true);
+
+        embedBuilder.setColor(new Color(240, 81, 51));//git-scm color
+        embedBuilder.setThumbnail(octocats.getRandomImageUrl());//github octocat thumbnail
+
+        try {
+            Date built = sdf.parse(gitRepoState.buildTime);
+            embedBuilder.setTimestamp(built.toInstant());
+            embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
+        } catch (ParseException ignored) {
+        }
+        event.getJDA().getTextChannelById("323605184016154635").sendMessage(embedBuilder.build()).queue();
     }
 
     @Override
@@ -94,5 +134,27 @@ public class EventLogger extends ListenerAdapter {
         }
         jda.getTextChannelById("285472208686546946").sendMessage(msg).queue();
     };
+
+
+    private String getGithubCommitLink() {
+        String result = "Could not find or create a valid Github url.";
+        GitRepoState gitRepoState = GitRepoState.getGitRepositoryState();
+        if (gitRepoState != null) {
+            String originUrl = gitRepoState.remoteOriginUrl;
+
+            Matcher m = GITHUB_URL_PATTERN.matcher(originUrl);
+
+            if (m.find()) {
+                String domain;
+                domain = m.group(2);
+                String user = m.group(3);
+                String repo = m.group(4);
+                String commitId = gitRepoState.commitId;
+
+                result = "https://" + domain + "/" + user + "/" + repo + "/commit/" + commitId;
+            }
+        }
+        return result;
+    }
 
 }
