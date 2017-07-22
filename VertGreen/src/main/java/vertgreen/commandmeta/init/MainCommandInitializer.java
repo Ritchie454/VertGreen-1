@@ -37,9 +37,10 @@ public class MainCommandInitializer {
     public static void initCommands() {
         //ADMIN
         CommandRegistry.registerCommand("announce", new AnnounceCommand());
+        CommandRegistry.registerCommand("vrestart", new BotRestartCommand());
         CommandRegistry.registerCommand("compile", new CompileCommand());
         CommandRegistry.registerCommand("eval", new EvalCommand());
-        CommandRegistry.registerCommand("exit", new ExitCommand(), "botrestart");
+        CommandRegistry.registerCommand("exit", new ExitCommand());
         CommandRegistry.registerCommand("revive", new ReviveCommand());
         CommandRegistry.registerCommand("update", new UpdateCommand());
         //FUN
