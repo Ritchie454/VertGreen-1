@@ -176,7 +176,7 @@ public class EventListenerGreen extends AbstractEventListener {
     @Override
     public void onReady(ReadyEvent event) {
         super.onReady(event);
-        event.getJDA().getPresence().setGame(Game.of("with Nepgear", "http://twitch.tv/ritchiewastaken"));
+        event.getJDA().getPresence().setGame(Game.of(Config.CONFIG.getGame()));
     }
 
     @Override

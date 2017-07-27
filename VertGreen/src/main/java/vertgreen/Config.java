@@ -75,6 +75,7 @@ public class Config {
     private String spotifyId;
     private String spotifySecret;
     private String prefix = DEFAULT_PREFIX;
+    private String game;
     private boolean restServerEnabled = true;
     private List<String> adminIds = new ArrayList<>();
     private boolean useAutoBlacklist = false;
@@ -128,6 +129,7 @@ public class Config {
                 adminIds.add(admins + "");
             }
             useAutoBlacklist = (boolean) config.getOrDefault("useAutoBlacklist", useAutoBlacklist);
+            game = (String) config.getOrDefault("game", game);
 
             log.info("Using prefix: " + prefix);
 
@@ -171,8 +173,8 @@ public class Config {
             }
 
             if(getDistribution() == DistributionEnum.DEVELOPMENT) {
-                log.info("Development distribution; forcing 2 shards");
-                numShards = 2;
+                log.info("Development distribution; forcing 5 shards");
+                numShards = 5;
             } else {
                 //this is the first request on start
                 //it sometimes fails cause network isn'T set up yet. wait 10 sec and try one more time in that case
@@ -291,6 +293,8 @@ public class Config {
     public String getMalUser() {
         return malUser;
     }
+
+    public String getGame() { return game; }
 
     public String getMalPassword() {
         return malPassword;

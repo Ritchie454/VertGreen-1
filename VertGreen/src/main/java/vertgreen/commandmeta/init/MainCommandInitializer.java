@@ -26,6 +26,7 @@ package vertgreen.commandmeta.init;
 
 import vertgreen.command.admin.*;
 import vertgreen.command.fun.*;
+import vertgreen.command.image.*;
 import vertgreen.command.maintenance.*;
 import vertgreen.command.moderation.*;
 import vertgreen.command.util.*;
@@ -46,14 +47,22 @@ public class MainCommandInitializer {
         //FUN
         CommandRegistry.registerCommand("hug", new HugCommand("https://imgur.com/a/jHJOc"));
         CommandRegistry.registerCommand("joke", new JokeCommand(), "jk");
-        CommandRegistry.registerCommand("rb1", new NepImageCommand(), "rb2", "rb3", "vii", "super", "megatag", "adf", "card");
         CommandRegistry.registerCommand("pat", new PatCommand("https://imgur.com/a/WiPTl"));
         CommandRegistry.registerCommand("talk", new TalkCommand());
-        CommandRegistry.registerCommand("s", new TextCommand("¯\\_(ツ)_/¯"), "shrug");
+        CommandRegistry.registerCommand("shrug", new TextCommand("¯\\_(ツ)_/¯"), "s");
         CommandRegistry.registerCommand("lenny", new TextCommand("( ͡° ͜ʖ ͡°)"));
         CommandRegistry.registerCommand("faceofdisapproval", new TextCommand("ಠ_ಠ"), "fod", "disapproving");
         CommandRegistry.registerCommand("sendenergy", new TextCommand("༼ つ ◕_◕ ༽つ"));
         CommandRegistry.registerCommand("wallet", new WalletCommand("http://imgur.com/a/PpAqX"));
+        //IMAGE
+        CommandRegistry.registerCommand("rb1", new NepImageCommand(), "rb2", "rb3", "vii", "super", "megatag", "adf", "card");
+        CommandRegistry.registerCommand("rb2", new NepImageCommand(), "rb1", "rb3", "vii", "super", "megatag", "adf", "card");
+        CommandRegistry.registerCommand("rb3", new NepImageCommand(), "rb1", "rb2", "vii", "super", "megatag", "adf", "card");
+        CommandRegistry.registerCommand("vii", new NepImageCommand(), "rb1", "rb2", "rb3", "super", "megatag", "adf", "card");
+        CommandRegistry.registerCommand("super", new NepImageCommand(), "rb1", "rb2", "rb3", "vii", "megatag", "adf", "card");
+        CommandRegistry.registerCommand("megatag", new NepImageCommand(), "rb1", "rb2", "rb3", "vii", "super", "adf", "card");
+        CommandRegistry.registerCommand("adf", new NepImageCommand(), "rb1", "rb2", "rb3", "vii", "super", "megatag", "card");
+        CommandRegistry.registerCommand("card", new NepImageCommand(), "rb1", "rb2", "rb3", "vii", "super", "megatag", "adf");
         //MAINTENANCE
         CommandRegistry.registerCommand("fuzzy", new FuzzyUserSearchCommand());
         CommandRegistry.registerCommand("gitinfo", new GitInfoCommand(), "git");

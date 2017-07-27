@@ -2,6 +2,8 @@
 
 Vert is a selfhosted and highly modified version of the discord bot FredBoat (A music bot), It is designed to be completely lag free too! You can activate the bot using <<help
 
+You can find some more info here: http://kurozu.me/
+
 You can donate on Patron below!
 
 [![Donate](https://kurozu.me/DonateButton.png)](https://www.patreon.com/VertGreen)

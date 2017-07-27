@@ -64,8 +64,7 @@ public class EventLogger extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent event) {
         VertGreen.getInstance(event.getJDA());
-        msg = "[:rocket:] Received ready event.";
-        event.getJDA().getTextChannelById("332940748905512960").sendMessage(msg).queue();
+        VertGreen.getTextChannelById("332940748905512960").sendMessage("[:rocket:] Received ready event.").queue();
         getGitInfo(event);
     }
 
@@ -138,7 +137,7 @@ public class EventLogger extends ListenerAdapter {
             embedBuilder.setFooter("Built on", "http://i.imgur.com/RjWwxlg.png");
         } catch (ParseException ignored) {
         }
-        event.getJDA().getTextChannelById("323605184016154635").sendMessage(embedBuilder.build()).queue();
+        VertGreen.getTextChannelById("333312174434942976").sendMessage(embedBuilder.build()).queue();
     }
 
 }

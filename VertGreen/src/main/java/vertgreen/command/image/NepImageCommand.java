@@ -1,15 +1,16 @@
-package vertgreen.command.fun;
+package vertgreen.command.image;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import vertgreen.Config;
+import vertgreen.command.fun.RandomImageCommand;
 import vertgreen.commandmeta.abs.Command;
-import vertgreen.commandmeta.abs.IFunCommand;
+import vertgreen.commandmeta.abs.IImageCommand;
 import net.dv8tion.jda.core.EmbedBuilder;
 
-public class NepImageCommand extends Command implements IFunCommand{
+public class NepImageCommand extends Command implements IImageCommand{
 
     RandomImageCommand rb1 = new RandomImageCommand("https://imgur.com/a/mhGBq");
     RandomImageCommand rb2 = new RandomImageCommand("https://imgur.com/a/uNtgL");
