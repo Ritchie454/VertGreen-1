@@ -1,26 +1,18 @@
-# VertGreen  [![Dependency Status](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e/badge.svg)](https://www.versioneye.com/user/projects/595fd74a0fb24f006e9d3a3e)
+<h1>Vert Bot!</h1>
+<p><img width=120 height=120 align="left" src="https://images.discordapp.net/avatars/320192251479195648/503e576bef183afabb3074a10924bb56.png"/>
+Vert! A music bot based off of Fredboat, however she will be replaced when I finish Orange Heart. For now; fredboat can be found here:<br />
+<em>https://github.com/Frederikam/FredBoat</em><br />
+I also have a Patreon if you want to support Vert's server payments which you can find here:<br />
+<em>https://www.patreon.com/VertGreen</em></p>
 
-Vert is a selfhosted and highly modified version of the discord bot FredBoat (A music bot), It is designed to be completely lag free too! You can activate the bot using <<help
+# Discord
+<p><img width=120 height=120 align="left" src="https://www.shareicon.net/download/2016/12/30/866945_game_512x512.png"/>
+Vert is currently live in over 100 servers! You can finder her invite link here!<br />
+<em><a href="https://discordapp.com/oauth2/authorize?permissions=0&client_id=320192251479195648&scope=bot">Invite Vert to your server!</a></em><br />
+Since vert is soon to be replaced; she does not have a dedicated support server, but you can ask on my personal server<br />
+<em><a href="http://discord.gg/dWVqUP5">Join my personal server</a></em><br />
 
-You can find some more info here: http://kurozu.me/
-
-You can donate on Patron below!
-
-[![Donate](https://kurozu.me/DonateButton.png)](https://www.patreon.com/VertGreen)
-# Discord Stuff 
-
-You can Invite the bot or Join my server below!
-
-[![Invite Vert](https://kurozu.me/InviteButton.png)](https://kurozu.me/VertGreen)
-
-[![Join Uzume's Hideout](https://discordapp.com/api/guilds/285472208686546946/embed.png?style=banner2)](https://discord.gg/dWVqUP5)
-# Copyright
-
-   MIT License
-    Copyright (c) 2017 Frederik Ar. Mikkelsen
-  
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation            files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-  
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# About me
+<p><img width=120 height=120 align="left" src="https://images.discordapp.net/avatars/197063812027908097/afe0b61afcce4d305000c501a446d183.png"/>
+I am Blake (Kurozume, whatever); a fan of anime currently learning JAVA development and the discord API. I am still working on improving my coding skills as I build these bots, so if there are a few bugs; report them on the support server or message me directly on discord: Blake#4452<br /> <a href="https://discordapp.com/channels/@me"><em>Open Discord</em></a><br />
+Any other questions then also DM me with those as well and i'll be willing to answer if i'm available</p>

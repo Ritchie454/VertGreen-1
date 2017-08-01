@@ -133,3 +133,4 @@ target/
 /bootloader.json
 gc-*.log
 /.idea/
+readmeold.md
