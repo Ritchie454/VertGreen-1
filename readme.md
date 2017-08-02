@@ -13,6 +13,6 @@ Since vert is soon to be replaced; she does not have a dedicated support server,
 <em><a href="http://discord.gg/dWVqUP5">Join my personal server</a></em><br />
 
 # About me
-<p><img width=120 height=120 align="left" src="https://images.discordapp.net/avatars/197063812027908097/afe0b61afcce4d305000c501a446d183.png"/>
+<p><img width=120 height=120 align="left" src="https://avatars1.githubusercontent.com/u/29761188?v=4&s=460.png"/>
 I am Blake (Kurozume, whatever); a fan of anime currently learning JAVA development and the discord API. I am still working on improving my coding skills as I build these bots, so if there are a few bugs; report them on the support server or message me directly on discord: Blake#4452<br /> <a href="https://discordapp.com/channels/@me"><em>Open Discord</em></a><br />
 Any other questions then also DM me with those as well and i'll be willing to answer if i'm available</p>
